@@ -1,0 +1,21 @@
+[package]
+name = "arduino-blink"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "arduino_sdk"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rustymetal"
+path = "src/main.rs"
+
+[profile.release]
+panic = "abort"
+opt-level = "z"
+lto = true
+strip = true
+
+[dependencies]
+avrd = "1.0.0"
