@@ -2,9 +2,13 @@
 #![no_main]
 #![feature(asm_experimental_arch)]
 
-use avrd::current;
+pub mod io;
+pub(crate) mod sys;
+
 use core::arch::asm;
-use core::{hint::black_box, panic::PanicInfo};
+use core::panic::PanicInfo;
+use sys::reg_io::Register;
+use sys::reg_mappings as reg;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -19,25 +23,17 @@ fn delay(x: u32) {
     }
 }
 
-unsafe fn write_reg(reg: *mut u8, val: u8, mask: u8) {
-    let reg_val = reg.read_volatile();
-    reg.write_volatile((reg_val & !mask) | (val & mask));
-}
-
 #[no_mangle]
 extern "C" fn main() -> ! {
     const LED_BUILTIN: u8 = 5;
-    unsafe {
-        let portB_data_direction = current::DDRB;
-        // set it to output mode
-        write_reg(portB_data_direction, 1 << LED_BUILTIN, 1 << LED_BUILTIN);
-        let portB = current::PORTB;
+    let mut port_b_data_direction = Register::<reg::DDRB>::new();
+    unsafe { port_b_data_direction.write_reg(1 << LED_BUILTIN) };
+    let mut port_b = Register::<reg::PORTB>::new();
 
-        loop {
-            write_reg(portB, 1 << LED_BUILTIN, 1 << LED_BUILTIN);
-            delay(500_000);
-            write_reg(portB, 0, 1 << LED_BUILTIN);
-            delay(500_000);
-        }
+    loop {
+        unsafe { port_b.write_reg(1 << LED_BUILTIN) };
+        delay(500_000);
+        unsafe { port_b.write_reg(0) };
+        delay(500_000);
     }
 }

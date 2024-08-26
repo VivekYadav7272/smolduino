@@ -1,3 +1,5 @@
+#![allow(non_camel_case_types)]
+
 use avrd::current as inner;
 
 pub trait RegisterMapping {
