@@ -1,6 +1,19 @@
 use core::marker::PhantomData;
+pub trait RegisterMapping {
+    fn get_reg_addr() -> *mut u8;
+}
 
-use super::reg_mappings::{MaskMapping, RegisterMapping};
+pub trait MaskMapping {
+    type Register;
+
+    fn get_mask() -> u8;
+
+    fn get_shift() -> u8 {
+        let mask = Self::get_mask();
+        let shift = mask ^ (mask - 1);
+        shift.count_ones() as u8
+    }
+}
 
 /**
  * SAFETY: Must check if register being passed is actually a register, and if mask is correct or not.
@@ -24,11 +37,11 @@ impl<Reg: RegisterMapping> Register<Reg> {
     }
 
     // Required for registers
-    // ['ADCH', 'ADCL', 'DDRB', 'DDRC', 'DDRD', 'EEARH', 'EEARL', 'EEDR', 'GPIOR0', 'GPIOR1',
-    // 'GPIOR2', 'ICR1H', 'ICR1L', 'OCR0A', 'OCR0B', 'OCR1AH', 'OCR1AL', 'OCR1BH', 'OCR1BL',
-    // 'OCR2A', 'OCR2B', 'OSCCAL', 'PCMSK0', 'PCMSK1', 'PCMSK2', 'PINB', 'PINC', 'PIND', 'PORTB',
-    // 'PORTC', 'PORTD', 'SPDR', 'SPH', 'SPL', 'TCNT0', 'TCNT1H', 'TCNT1L', 'TCNT2', 'TWBR', 'TWDR',
-    // 'UBRR0H', 'UBRR0L', 'UDR0']
+    // ['ADC', 'ADCH', 'ADCL', 'DDRB', 'DDRC', 'DDRD', 'EEAR', 'EEARH', 'EEARL', 'EEDR', 'GPIOR0',
+    // 'GPIOR1', 'GPIOR2', 'ICR1', 'ICR1H', 'ICR1L', 'OCR0A', 'OCR0B', 'OCR1A', 'OCR1AH', 'OCR1AL',
+    // 'OCR1B', 'OCR1BH', 'OCR1BL', 'OCR2A', 'OCR2B', 'OSCCAL', 'PCMSK0', 'PCMSK1', 'PCMSK2', 'PINB',
+    // 'PINC', 'PIND', 'PORTB', 'PORTC', 'PORTD', 'SP', 'SPDR', 'SPH', 'SPL', 'TCNT0', 'TCNT1',
+    // 'TCNT1H', 'TCNT1L', 'TCNT2', 'TWBR', 'TWDR', 'UBRR0', 'UBRR0H', 'UBRR0L', 'UDR0']
     // which don't have available masks, so we don't really know what's "correct" to write there.
     // Most of these require a higher-level abstraction to be correctly/constraintly used anyways,
     // so it's good that having to use unsafe on them feels uneasy and reminds us to create
