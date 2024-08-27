@@ -1,4 +1,4 @@
-use crate::sys::{self, reg_io::Register, regs};
+use crate::sys::{self, mappings::regs, reg_io::Register};
 
 /**
  * Utilises the hardware UART capabilities of Atmega328p to do serial communication.
@@ -34,14 +34,9 @@ impl Serial {
 
         let ubrr_val: u32 = sys::F_CPU / (16 * baud_rate) - 1;
 
-        let mut ubrrl = Register::<regs::UBRR0L>::new();
-
-        // SAFETY: ubrr_val has been calculated using the formula given.
-        unsafe { ubrrl.write_reg((ubrr_val & 0xFF) as u8) };
-
-        let mut ubrrh = Register::<regs::UBRR0H>::new();
-
-        // SAFETY: ubrr_val has been calculated using the formula given.
-        unsafe { ubrrh.write_reg(((ubrr_val >> 8) & 0xFF) as u8) };
+        let mut ubrr = Register::<regs::UBRR0>::new();
+        // SAFETY: UBRR has been calculated using the formula in datasheet,
+        // hence it has to be a legal value.
+        unsafe { ubrr.write_reg(ubrr_val as u16) };
     }
 }
