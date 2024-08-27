@@ -1,11 +1,16 @@
+use crate::utils::num_traits::UnsignedNumber;
 use core::marker::PhantomData;
+
 pub trait RegisterMapping {
-    fn get_reg_addr() -> *mut u8;
+    type RegisterType: UnsignedNumber;
+    fn get_reg_addr() -> *mut Self::RegisterType;
 }
 
 pub trait MaskMapping {
-    type Register;
+    type Register: RegisterMapping;
 
+    // Technically, mask's type should be RegisterType, but all masks are actually just word-sized (u8)
+    // at largest.
     fn get_mask() -> u8;
 
     fn get_shift() -> u8 {
@@ -18,13 +23,14 @@ pub trait MaskMapping {
 /**
  * SAFETY: Must check if register being passed is actually a register, and if mask is correct or not.
  */
-unsafe fn write_reg_unchecked(reg: *mut u8, val: u8, mask: u8) {
+unsafe fn write_reg_unchecked<T: UnsignedNumber>(reg: *mut T, val: T, mask: u8) {
     let reg_val = reg.read_volatile();
+    let mask: T = mask.into();
     reg.write_volatile((reg_val & !mask) | (val & mask));
 }
 
 pub struct Register<Reg: RegisterMapping> {
-    reg: *mut u8,
+    reg: *mut Reg::RegisterType,
     _marker: PhantomData<Reg>,
 }
 
@@ -46,25 +52,34 @@ impl<Reg: RegisterMapping> Register<Reg> {
     // Most of these require a higher-level abstraction to be correctly/constraintly used anyways,
     // so it's good that having to use unsafe on them feels uneasy and reminds us to create
     // a higher-level abstraction first.
-    pub unsafe fn write_reg(&mut self, val: u8) {
+    pub unsafe fn write_reg(&mut self, val: Reg::RegisterType) {
         // SAFETY: User must ensure that the bits being written to are correct or not.
         write_reg_unchecked(self.reg, val, 0xFF);
     }
 
-    pub fn write_reg_mask<Mask: MaskMapping<Register = Reg>>(&mut self, val: u8) {
+    pub fn write_reg_mask<Mask: MaskMapping<Register = Reg>>(&mut self, val: Reg::RegisterType) {
         // SAFETY: Using type safety, we've ensured that only allowed bits of a register are written to.
         // Semantically however, it's not assured if the bits written are meaningful or not.
         unsafe { write_reg_unchecked(self.reg, val, Mask::get_mask()) }
     }
 
-    pub fn read_reg(&self) -> u8 {
+    pub fn read_reg(&self) -> Reg::RegisterType {
         // SAFETY: Using type-safety, we know the pointer we're dereferencing is non-null and aligned
         // (naturally aligned because they're all u8)
         unsafe { *self.reg }
     }
 
     pub fn read_reg_masked<Mask: MaskMapping<Register = Reg>>(&self) -> u8 {
-        unsafe { *self.reg & Mask::get_mask() }
+        // SAFETY:
+        // 1) Using type-safety (only registers declared in sys::regs), we know the pointer we're dereferencing is non-null and aligned
+        // (naturally aligned because they're all u8)
+        // 2) We can assert that conversion into u8 will never fail because mask is u8,
+        // meaning whatever value we get after and'ing with a mask is a u8.
+        unsafe {
+            (*self.reg & Mask::get_mask().into())
+                .try_into()
+                .unwrap_unchecked()
+        }
     }
 }
 
@@ -87,7 +102,7 @@ where
 
     pub fn write_val(&mut self, val: u8) {
         let val = val << M::get_shift();
-        self.reg.write_reg_mask::<M>(val);
+        self.reg.write_reg_mask::<M>(val.into());
     }
 
     pub fn read_val(&self) -> u8 {
