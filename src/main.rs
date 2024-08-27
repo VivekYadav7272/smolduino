@@ -7,8 +7,8 @@ pub(crate) mod sys;
 
 use core::arch::asm;
 use core::panic::PanicInfo;
+use sys::mappings::regs;
 use sys::reg_io::Register;
-use sys::reg_mappings as reg;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -26,9 +26,9 @@ fn delay(x: u32) {
 #[no_mangle]
 extern "C" fn main() -> ! {
     const LED_BUILTIN: u8 = 5;
-    let mut port_b_data_direction = Register::<reg::DDRB>::new();
+    let mut port_b_data_direction = Register::<regs::DDRB>::new();
     unsafe { port_b_data_direction.write_reg(1 << LED_BUILTIN) };
-    let mut port_b = Register::<reg::PORTB>::new();
+    let mut port_b = Register::<regs::PORTB>::new();
 
     loop {
         unsafe { port_b.write_reg(1 << LED_BUILTIN) };
