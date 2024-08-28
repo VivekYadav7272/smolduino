@@ -16,16 +16,15 @@ pub trait MaskMapping {
     fn get_shift() -> u8 {
         let mask = Self::get_mask();
         let shift = mask ^ (mask - 1);
-        shift.count_ones() as u8
+        (shift.count_ones() - 1) as u8
     }
 }
 
 /**
  * SAFETY: Must check if register being passed is actually a register, and if mask is correct or not.
  */
-unsafe fn write_reg_unchecked<T: UnsignedNumber>(reg: *mut T, val: T, mask: u8) {
+unsafe fn write_reg_unchecked<T: UnsignedNumber>(reg: *mut T, val: T, mask: T) {
     let reg_val = reg.read_volatile();
-    let mask: T = mask.into();
     reg.write_volatile((reg_val & !mask) | (val & mask));
 }
 
@@ -61,16 +60,18 @@ impl<Reg: RegisterMapping> Register<Reg> {
     // so it's good that having to use unsafe on them feels uneasy and reminds us to create
     // a higher-level abstraction first.
     pub unsafe fn write_reg(&mut self, val: Reg::RegisterType) {
+        let bits = core::mem::size_of::<Reg::RegisterType>() as u32 * 8;
+        let mask = (1u32 << bits) - 1;
+
+        // SAFETY: Should be fine because the mask should only be exactly as large as RegisterType.
+        let mask: Reg::RegisterType = unsafe { mask.try_into().unwrap_unchecked() };
         // SAFETY: User must ensure that the bits being written to are correct or not.
-        write_reg_unchecked(self.reg, val, 0xFF);
+        unsafe { write_reg_unchecked(self.reg, val, mask.into()) };
     }
 
-    pub unsafe fn write_reg_mask<Mask: MaskMapping<Register = Reg>>(
-        &mut self,
-        val: Reg::RegisterType,
-    ) {
+    pub unsafe fn write_reg_masked(&mut self, mask: &Mask<Reg>) {
         // SAFETY: Must ensure if the bits written are meaningful or not.
-        unsafe { write_reg_unchecked(self.reg, val, Mask::get_mask()) }
+        unsafe { write_reg_unchecked(self.reg, mask.get_val().into(), mask.get_mask().into()) }
     }
 
     pub fn read_reg(&self) -> Reg::RegisterType {
@@ -78,43 +79,84 @@ impl<Reg: RegisterMapping> Register<Reg> {
         unsafe { *self.reg }
     }
 
-    pub fn read_reg_masked<Mask: MaskMapping<Register = Reg>>(&self) -> u8 {
+    pub fn read_reg_masked(&self, mask: &Mask<Reg>) -> u8 {
         // SAFETY:
         // 1) Using type-safety (only registers declared in sys::regs), we know the pointer we're dereferencing is non-null and aligned
         // (naturally aligned because they're all u8)
         // 2) We can assert that conversion into u8 will never fail because mask is u8,
         // meaning whatever value we get after and'ing with a mask is a u8.
         unsafe {
-            (*self.reg & Mask::get_mask().into())
+            (*self.reg & mask.get_mask().into())
                 .try_into()
                 .unwrap_unchecked()
         }
     }
 }
 
-pub struct Mask<M: MaskMapping> {
-    reg: Register<M::Register>,
-    _marker: PhantomData<M>,
+pub struct Mask<Reg: RegisterMapping> {
+    val: u8,
+    mask: u8,
+    reg: PhantomData<Reg>,
 }
 
-impl<M: MaskMapping> Mask<M> {
+impl<Reg: RegisterMapping> Mask<Reg> {
     pub fn new() -> Self {
         Self {
-            reg: Register::new(),
-            _marker: PhantomData,
+            val: 0,
+            mask: 0,
+            reg: PhantomData,
         }
     }
 
-    pub unsafe fn write_val(&mut self, val: u8) {
-        let val = val << M::get_shift();
+    pub fn add_masked_val<M: MaskMapping<Register = Reg>>(
+        &mut self,
+        _mask: M,
+        val: u8,
+    ) -> &mut Self {
+        self.val |= (val << M::get_shift()) & M::get_mask();
+        self.mask |= M::get_mask();
+        self
+    }
 
-        // SAFETY: Same as below
-        unsafe { self.reg.write_reg_mask::<M>(val.into()) };
+    pub fn clear(&mut self) -> &mut Self {
+        self.val = 0;
+        self.mask = 0;
+        self
+    }
+
+    /**
+     * Writes the value with the mask accumulated till now, into the register.
+     */
+    pub unsafe fn write_val(&mut self) {
+        // SAFETY: Same safety implication as Register::write_reg_masked
+        unsafe { Register::<Reg>::new().write_reg_masked(&*self) };
+    }
+
+    /**
+     * Returns the val as it would look after getting shifted and masked.
+     */
+    pub fn get_masked_val(&self, val: u8) -> u8 {
+        let val = val << self.get_shift();
+        val & self.get_mask()
     }
 
     pub fn read_val(&self) -> u8 {
         // SAFETY: Through type-safety, we've ensured that the register is correct, the value is placed
         // correctly, and that the mask is correct (obviously)
-        self.reg.read_reg_masked::<M>()
+        Register::<Reg>::new().read_reg_masked(self)
+    }
+
+    pub fn get_val(&self) -> u8 {
+        self.val
+    }
+
+    pub fn get_mask(&self) -> u8 {
+        self.mask
+    }
+
+    pub fn get_shift(&self) -> u8 {
+        let mask = self.get_mask();
+        let shift = mask ^ (mask - 1);
+        (shift.count_ones() - 1) as u8
     }
 }
