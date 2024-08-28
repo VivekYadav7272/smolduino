@@ -98,21 +98,19 @@ impl Serial {
 
         // For UCSRC register
 
-        let mut ucsrc_val = 0;
-        // set URSEL bit (7) to 1 (because URSEL=0 implies we're dealing with UBRR0H)
-        ucsrc_val = 1 << 7;
-        // leave UMSEL bit to 0
-        // leave both UPM bits as parity as of now is not required
-        // leave USBS (bit 3) to 0 since we want 1 stop bit
-        // set UCSZ to 0b11 to show we want a packet to be 8-bits long.
-        ucsrc_val |= Mask::<regs::UCSR0C>::new()
-            .add_masked_val(masks::UCSZ0, 0b11)
-            .get_val();
+        let mut ucsrc_val = Mask::<regs::UCSR0C>::new();
+        ucsrc_val
+            // set URSEL bit (7) to 1 (because URSEL=0 implies we're dealing with UBRR0H)
+            // leave UMSEL bit to 0
+            // (URSEL0's mask is also UMSEL0, := 0xC0)
+            .add_masked_val(masks::UMSEL0, 0b10)
+            // leave both UPM bits as parity as of now is not required
+            // leave USBS (bit 3) to 0 since we want 1 stop bit
+            // set UCSZ to 0b11 to show we want a packet to be 8-bits long.
+            .add_masked_val(masks::UCSZ0, 0b11);
 
-        // SAFETY: We don't have masks for URSEL and other bits,
-        // but we assert it here that those bits belong to UCSR0C
-        // and the values written are legal.
-        unsafe { Register::<regs::UCSR0C>::new().write_reg(ucsrc_val) };
+        // SAFETY: Mask has legal values bruv
+        unsafe { Register::<regs::UCSR0C>::new().write_reg_masked(&ucsrc_val) };
     }
 }
 
