@@ -1,10 +1,10 @@
 [package]
-name = "arduino-sdk"
+name = "smolduino"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "arduino_sdk"
+name = "smolduino"
 path = "src/lib.rs"
 
 [[bin]]
