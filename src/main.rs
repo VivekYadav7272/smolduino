@@ -4,6 +4,7 @@
 
 pub mod io;
 pub(crate) mod sys;
+pub mod utils;
 
 use core::arch::asm;
 use core::panic::PanicInfo;

@@ -83,16 +83,12 @@ impl<Reg: RegisterMapping> Register<Reg> {
     }
 }
 
-pub struct Mask<Reg: RegisterMapping, M: MaskMapping<Register = Reg>> {
-    reg: Register<Reg>,
+pub struct Mask<M: MaskMapping> {
+    reg: Register<M::Register>,
     _marker: PhantomData<M>,
 }
 
-impl<Reg, M> Mask<Reg, M>
-where
-    Reg: RegisterMapping,
-    M: MaskMapping<Register = Reg>,
-{
+impl<M: MaskMapping> Mask<M> {
     pub fn new() -> Self {
         Self {
             reg: Register::new(),
