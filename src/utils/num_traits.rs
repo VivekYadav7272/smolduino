@@ -7,11 +7,20 @@ pub trait UnsignedNumber:
     + Mul<Output = Self>
     + Sub<Output = Self>
     + Not<Output = Self>
-    + From<u8>
     + Sized
     + Clone
     + Copy
     + TryInto<u8>
+    + TryInto<u16>
+    + TryInto<u32>
+    + TryInto<u64>
+    + TryInto<usize>
+    + From<u8>
+    + TryFrom<u8>
+    + TryFrom<u16>
+    + TryFrom<u32>
+    + TryFrom<u64>
+    + TryFrom<usize>
 {
 }
 
