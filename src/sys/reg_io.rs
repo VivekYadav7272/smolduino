@@ -30,11 +30,19 @@ unsafe fn write_reg_unchecked<T: UnsignedNumber>(reg: *mut T, val: T, mask: u8) 
 }
 
 pub struct Register<Reg: RegisterMapping> {
+    // We could've not stored this field and just called Reg::get_reg_addr()
+    // everytime we needed to. However, ironically imo that would cause more code bloat
+    // (all functions using Reg::get_reg_addr() now necessarily need to have one instance for each Reg)
+    // This way, those functions only need to generate one code that deals with `self.reg`.
+    // This still does generate code for each Reg::RegisterType, but in practice there are only two -
+    // u8 and u16.
     reg: *mut Reg::RegisterType,
     _marker: PhantomData<Reg>,
 }
 
 impl<Reg: RegisterMapping> Register<Reg> {
+    // MAYBE: Compiler probably inlines this function, meaning we don't have multiple instances
+    // of `Self::new()` for each Reg type.
     pub fn new() -> Self {
         Self {
             reg: Reg::get_reg_addr(),
@@ -57,15 +65,16 @@ impl<Reg: RegisterMapping> Register<Reg> {
         write_reg_unchecked(self.reg, val, 0xFF);
     }
 
-    pub fn write_reg_mask<Mask: MaskMapping<Register = Reg>>(&mut self, val: Reg::RegisterType) {
-        // SAFETY: Using type safety, we've ensured that only allowed bits of a register are written to.
-        // Semantically however, it's not assured if the bits written are meaningful or not.
+    pub unsafe fn write_reg_mask<Mask: MaskMapping<Register = Reg>>(
+        &mut self,
+        val: Reg::RegisterType,
+    ) {
+        // SAFETY: Must ensure if the bits written are meaningful or not.
         unsafe { write_reg_unchecked(self.reg, val, Mask::get_mask()) }
     }
 
     pub fn read_reg(&self) -> Reg::RegisterType {
-        // SAFETY: Using type-safety, we know the pointer we're dereferencing is non-null and aligned
-        // (naturally aligned because they're all u8)
+        // SAFETY: All pointers/structs defined in regs::* are non-null and aligned.
         unsafe { *self.reg }
     }
 
@@ -96,9 +105,11 @@ impl<M: MaskMapping> Mask<M> {
         }
     }
 
-    pub fn write_val(&mut self, val: u8) {
+    pub unsafe fn write_val(&mut self, val: u8) {
         let val = val << M::get_shift();
-        self.reg.write_reg_mask::<M>(val.into());
+
+        // SAFETY: Same as below
+        unsafe { self.reg.write_reg_mask::<M>(val.into()) };
     }
 
     pub fn read_val(&self) -> u8 {
