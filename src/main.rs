@@ -4,37 +4,26 @@
 
 pub mod io;
 pub(crate) mod sys;
+pub mod timing;
 pub mod utils;
 
-use core::arch::asm;
+use core::fmt::Write;
 use core::panic::PanicInfo;
-use sys::mappings::regs;
-use sys::reg_io::Register;
+use io::serial::Serial;
+use timing::delay;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-fn delay(x: u32) {
-    for _ in 0..x {
-        unsafe {
-            asm!("nop");
-        }
-    }
-}
-
 #[no_mangle]
 extern "C" fn main() -> ! {
-    const LED_BUILTIN: u8 = 5;
-    let mut port_b_data_direction = Register::<regs::DDRB>::new();
-    unsafe { port_b_data_direction.write_reg(1 << LED_BUILTIN) };
-    let mut port_b = Register::<regs::PORTB>::new();
-
+    let mut serial = Serial::with_baud_rate(9600);
     loop {
-        unsafe { port_b.write_reg(1 << LED_BUILTIN) };
-        delay(500_000);
-        unsafe { port_b.write_reg(0) };
-        delay(500_000);
+        serial
+            .write_str("Hell yea mannn this shit works!!\n")
+            .unwrap();
+        delay::delay(500_000);
     }
 }
