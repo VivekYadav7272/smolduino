@@ -1,7 +1,7 @@
 use crate::sys::{
     self,
     mappings::{masks, regs},
-    reg_io::{Mask, MaskMapping, Register},
+    reg_io::{Mask, Register},
 };
 
 /**
@@ -49,15 +49,12 @@ impl Serial {
         // We try U2X = 1 mode first, as it has much better error rates for each baud rate
         // compared to U2X = 0 mode.
         let mut ubrr_val: u32 = get_ubrr_val(baud_rate, true);
-        // UBRR register only has 12 bits. So if ubrr_val >= 2^12, then we try U2X = 0 instead.
 
-        if !(0u32..1 << 12).contains(&ubrr_val) {
+        if (0u32..1 << 12).contains(&ubrr_val) {
             // SAFETY: U2X0 is a bitfield in UCSRA0 register, hence 1 is a valid value.
-            unsafe {
-                Mask::<regs::UCSR0A>::new()
-                    .add_masked_val(masks::U2X0, 1)
-                    .write_val()
-            };
+            unsafe { Mask::with_mask_val(masks::U2X0, 1).write_val() };
+        } else {
+            // UBRR register only has 12 bits. So if ubrr_val >= 2^12, then we try U2X = 0 instead.
             ubrr_val = get_ubrr_val(baud_rate, false);
         }
 
@@ -91,10 +88,10 @@ impl Serial {
         let mut ucsrb_val = Mask::<regs::UCSR0B>::new();
         unsafe {
             ucsrb_val
-                .add_masked_val(masks::RXCIE0, 1)
-                .add_masked_val(masks::UDRIE0, 1)
-                .add_masked_val(masks::RXEN0, 1)
-                .add_masked_val(masks::TXEN0, 1)
+                .add_mask_val(masks::RXCIE0, 1)
+                .add_mask_val(masks::UDRIE0, 1)
+                .add_mask_val(masks::RXEN0, 1)
+                .add_mask_val(masks::TXEN0, 1)
                 .write_val();
         }
 
@@ -107,18 +104,41 @@ impl Serial {
                 // set URSEL bit (7) to 1 (because URSEL=0 implies we're dealing with UBRR0H)
                 // leave UMSEL bit to 0
                 // (URSEL0's mask is also UMSEL0, := 0xC0)
-                .add_masked_val(masks::UMSEL0, 0b10)
+                .add_mask_val(masks::UMSEL0, 0b10)
                 // leave both UPM bits as parity as of now is not required
                 // leave USBS (bit 3) to 0 since we want 1 stop bit
                 // set UCSZ to 0b11 to show we want a packet to be 8-bits long.
-                .add_masked_val(masks::UCSZ0, 0b11)
+                .add_mask_val(masks::UCSZ0, 0b11)
                 .write_val();
         }
     }
 }
 
 impl Serial {
-    fn write(&mut self, byte: u8) -> Result<(), ()> {
+    pub fn write(&mut self, byte: u8) -> Result<(), ()> {
+        // TODO: Make it robust, this is just to see if everything till now has been configured
+        // correctly or not.
+        // only using the mask for reading from reg so value here doesn't matter.
+        let udre = Mask::with_mask_val(masks::UDRE0, 0);
+        while udre.read_reg_masked() == 0 {}
+
+        let mut udr = Register::<regs::UDR0>::new();
+        // SAFETY: We can write whatever we want here, all u8's are legal.
+        unsafe { udr.write_reg(byte) };
+        Ok(())
+    }
+}
+
+impl Write for Serial {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        let s = s.as_bytes();
+        for b in s {
+            match self.write(*b) {
+                Ok(()) => {}
+                Err(_) => return Err(Error),
+            }
+        }
+
         Ok(())
     }
 }
