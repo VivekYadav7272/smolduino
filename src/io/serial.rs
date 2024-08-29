@@ -9,6 +9,9 @@ use crate::sys::{
 /**
  * Utilises the hardware UART capabilities of Atmega328p to do serial communication.
  */
+// TODO: IT'S CURRENTLY MEMORY-UNSAFE!! Because people can create multiple instances of Serial
+// and encounter race conditions. Will try to find a way to expose either a singleton (compile-time constraint)
+// or a constructor that returns a Result.
 pub struct Serial {
     baud_rate: u32,
 }
