@@ -76,7 +76,7 @@ impl<Reg: RegisterMapping> Register<Reg> {
 
     pub fn read_reg(&self) -> Reg::RegisterType {
         // SAFETY: All pointers/structs defined in regs::* are non-null and aligned.
-        unsafe { *self.reg }
+        unsafe { self.reg.read_volatile() }
     }
 
     pub fn read_reg_masked(&self, mask: &Mask<Reg>) -> u8 {
@@ -86,7 +86,7 @@ impl<Reg: RegisterMapping> Register<Reg> {
         // 2) We can assert that conversion into u8 will never fail because mask is u8,
         // meaning whatever value we get after and'ing with a mask is a u8.
         unsafe {
-            (*self.reg & mask.get_mask().into())
+            (self.reg.read_volatile() & mask.get_mask().into())
                 .try_into()
                 .unwrap_unchecked()
         }
@@ -108,11 +108,13 @@ impl<Reg: RegisterMapping> Mask<Reg> {
         }
     }
 
-    pub fn add_masked_val<M: MaskMapping<Register = Reg>>(
-        &mut self,
-        _mask: M,
-        val: u8,
-    ) -> &mut Self {
+    pub fn with_mask_val<M: MaskMapping<Register = Reg>>(mask: M, val: u8) -> Self {
+        let mut me = Self::new();
+        me.add_mask_val(mask, val);
+        me
+    }
+
+    pub fn add_mask_val<M: MaskMapping<Register = Reg>>(&mut self, _mask: M, val: u8) -> &mut Self {
         self.val |= (val << M::get_shift()) & M::get_mask();
         self.mask |= M::get_mask();
         self
@@ -132,15 +134,17 @@ impl<Reg: RegisterMapping> Mask<Reg> {
         unsafe { Register::<Reg>::new().write_reg_masked(&*self) };
     }
 
-    /**
-     * Returns the val as it would look after getting shifted and masked.
-     */
-    pub fn get_masked_val(&self, val: u8) -> u8 {
-        let val = val << self.get_shift();
-        val & self.get_mask()
+    pub fn add_val(&mut self, val: u8) -> &mut Self {
+        self.val |= val;
+        self
     }
 
-    pub fn read_val(&self) -> u8 {
+    pub fn add_mask<M: MaskMapping<Register = Reg>>(&mut self, _mask: M) -> &mut Self {
+        self.mask |= M::get_mask();
+        self
+    }
+
+    pub fn read_reg_masked(&self) -> u8 {
         // SAFETY: Through type-safety, we've ensured that the register is correct, the value is placed
         // correctly, and that the mask is correct (obviously)
         Register::<Reg>::new().read_reg_masked(self)
