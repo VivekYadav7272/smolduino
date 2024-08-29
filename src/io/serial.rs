@@ -1,3 +1,5 @@
+use core::fmt::{Error, Write};
+
 use crate::sys::{
     self,
     mappings::{masks, regs},
