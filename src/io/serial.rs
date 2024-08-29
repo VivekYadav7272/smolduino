@@ -26,6 +26,8 @@ impl Serial {
         Self::default()
     }
 
+    // Max baud rate possible is 1Mbps. Upon request of a higher baud rate,
+    // it will automatically saturate to 1Mbps (UBRR = 0).
     pub fn with_baud_rate(baud_rate: u32) -> Self {
         Self::init(baud_rate);
         Self { baud_rate }
@@ -99,27 +101,35 @@ impl Serial {
         // For UCSRC register
 
         let mut ucsrc_val = Mask::<regs::UCSR0C>::new();
-        ucsrc_val
-            // set URSEL bit (7) to 1 (because URSEL=0 implies we're dealing with UBRR0H)
-            // leave UMSEL bit to 0
-            // (URSEL0's mask is also UMSEL0, := 0xC0)
-            .add_masked_val(masks::UMSEL0, 0b10)
-            // leave both UPM bits as parity as of now is not required
-            // leave USBS (bit 3) to 0 since we want 1 stop bit
-            // set UCSZ to 0b11 to show we want a packet to be 8-bits long.
-            .add_masked_val(masks::UCSZ0, 0b11);
-
         // SAFETY: Mask has legal values bruv
-        unsafe { Register::<regs::UCSR0C>::new().write_reg_masked(&ucsrc_val) };
+        unsafe {
+            ucsrc_val
+                // set URSEL bit (7) to 1 (because URSEL=0 implies we're dealing with UBRR0H)
+                // leave UMSEL bit to 0
+                // (URSEL0's mask is also UMSEL0, := 0xC0)
+                .add_masked_val(masks::UMSEL0, 0b10)
+                // leave both UPM bits as parity as of now is not required
+                // leave USBS (bit 3) to 0 since we want 1 stop bit
+                // set UCSZ to 0b11 to show we want a packet to be 8-bits long.
+                .add_masked_val(masks::UCSZ0, 0b11)
+                .write_val();
+        }
+    }
+}
+
+impl Serial {
+    fn write(&mut self, byte: u8) -> Result<(), ()> {
+        Ok(())
     }
 }
 
 fn get_ubrr_val(baud_rate: u32, u2x_enabled: bool) -> u32 {
     // => UBRR = Freq/(16*BaudRate) - 1 (with U2X = 0)
     // => UBRR = Freq/(8*BaudRate) - 1 (with U2X = 1)
+
     if u2x_enabled {
-        sys::F_CPU / (8 * baud_rate) - 1
+        sys::F_CPU / baud_rate.saturating_mul(8) - 1
     } else {
-        sys::F_CPU / (16 * baud_rate) - 1
+        sys::F_CPU / baud_rate.saturating_mul(16) - 1
     }
 }
