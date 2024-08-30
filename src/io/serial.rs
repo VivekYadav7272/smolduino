@@ -1,3 +1,5 @@
+use core::convert::Infallible;
+
 use crate::{
     error::Error,
     sys::{
@@ -6,6 +8,8 @@ use crate::{
         reg_io::{Mask, Register},
     },
 };
+
+use core2::io;
 
 /**
  * Utilises the hardware UART capabilities of Atmega328p to do serial communication.
@@ -121,7 +125,7 @@ impl Serial {
 }
 
 impl Serial {
-    pub fn write(&mut self, byte: u8) -> Result<(), ()> {
+    pub fn write(&mut self, byte: u8) -> io::Result<usize> {
         // TODO: Make it robust, this is just to see if everything till now has been configured
         // correctly or not.
         // only using the mask for reading from reg so value here doesn't matter.
@@ -131,6 +135,20 @@ impl Serial {
         let mut udr = Register::<regs::UDR0>::new();
         // SAFETY: We can write whatever we want here, all u8's are legal.
         unsafe { udr.write_reg(byte) };
+        Ok(1)
+    }
+}
+
+impl io::Write for Serial {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        for &b in buf {
+            self.write(b)?;
+        }
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        // TODO: When we implement buffers for RX/TX, then we need to flush them here.
         Ok(())
     }
 }

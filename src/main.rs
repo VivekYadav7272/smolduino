@@ -2,13 +2,14 @@
 #![no_main]
 #![feature(asm_experimental_arch)]
 
+pub mod error;
 pub mod io;
 pub(crate) mod sys;
 pub mod timing;
 pub mod utils;
 
-use core::fmt::Write;
 use core::panic::PanicInfo;
+use core2::io::Write;
 use io::serial::Serial;
 use timing::delay;
 
@@ -19,10 +20,10 @@ fn panic(_info: &PanicInfo) -> ! {
 
 #[no_mangle]
 extern "C" fn main() -> ! {
-    let mut serial = Serial::with_baud_rate(9600);
+    let mut serial = Serial::with_baud_rate(9600).unwrap();
     loop {
         serial
-            .write_str("Hell yea mannn this shit works!!\n")
+            .write_all(b"Damn this really do be workin huh\n")
             .unwrap();
         delay::delay(500_000);
     }
