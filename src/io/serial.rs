@@ -11,6 +11,7 @@ use crate::{
 
 use core2::io;
 
+static mut SINGLETON_TAKEN: bool = false;
 /**
  * Utilises the hardware UART capabilities of Atmega328p to do serial communication.
  */
@@ -22,7 +23,6 @@ impl Serial {
     // Max baud rate possible is 1Mbps. Upon request of a higher baud rate,
     // it will automatically saturate to 1Mbps (UBRR = 0).
     pub fn with_baud_rate(baud_rate: u32) -> Result<Self, Error> {
-        static mut SINGLETON_TAKEN: bool = false;
         // TODO: Re-implement synchronisation primtives like Cell<T> and RefCell<T>
         // and guard against re-entrancy via interrupts. Then implement Sync for them
         // (really the only form of "race condition" we can encounter so they are Sync)
@@ -30,8 +30,8 @@ impl Serial {
         // THEN, we just use a Cell<bool> instead.
 
         // SAFETY: We're a single-threaded single-core system, no possibility of a race-access to this
-        // static mut. There is no danger of an interrupt accessing this global,
-        // since this global has no visibility outside this function.
+        // static mut. The global is only visible in this translation unit, so if no interrupts
+        // use the global in this file, it's safe to read/write to this global.
         if unsafe { !SINGLETON_TAKEN } {
             unsafe {
                 SINGLETON_TAKEN = true;
@@ -136,6 +136,15 @@ impl Serial {
         // SAFETY: We can write whatever we want here, all u8's are legal.
         unsafe { udr.write_reg(byte) };
         Ok(1)
+    }
+}
+
+impl Drop for Serial {
+    fn drop(&mut self) {
+        // SAFETY: Same safety concerns as the usage in Self::with_baud_rate
+        unsafe {
+            SINGLETON_TAKEN = false;
+        }
     }
 }
 
