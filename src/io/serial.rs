@@ -1,41 +1,42 @@
-use core::fmt::{Error, Write};
-
-use crate::sys::{
-    self,
-    mappings::{masks, regs},
-    reg_io::{Mask, Register},
+use crate::{
+    error::Error,
+    sys::{
+        self,
+        mappings::{masks, regs},
+        reg_io::{Mask, Register},
+    },
 };
 
 /**
  * Utilises the hardware UART capabilities of Atmega328p to do serial communication.
  */
-// TODO: IT'S CURRENTLY MEMORY-UNSAFE!! Because people can create multiple instances of Serial
-// and encounter race conditions. Will try to find a way to expose either a singleton (compile-time constraint)
-// or a constructor that returns a Result.
 pub struct Serial {
     baud_rate: u32,
 }
 
-impl Default for Serial {
-    fn default() -> Self {
-        const DEFAULT_BAUD_RATE: u32 = 9600;
-        Self::init(DEFAULT_BAUD_RATE);
-        Self {
-            baud_rate: DEFAULT_BAUD_RATE,
-        }
-    }
-}
-
 impl Serial {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     // Max baud rate possible is 1Mbps. Upon request of a higher baud rate,
     // it will automatically saturate to 1Mbps (UBRR = 0).
-    pub fn with_baud_rate(baud_rate: u32) -> Self {
-        Self::init(baud_rate);
-        Self { baud_rate }
+    pub fn with_baud_rate(baud_rate: u32) -> Result<Self, Error> {
+        static mut SINGLETON_TAKEN: bool = false;
+        // TODO: Re-implement synchronisation primtives like Cell<T> and RefCell<T>
+        // and guard against re-entrancy via interrupts. Then implement Sync for them
+        // (really the only form of "race condition" we can encounter so they are Sync)
+        // if they are guarded against interrupts.
+        // THEN, we just use a Cell<bool> instead.
+
+        // SAFETY: We're a single-threaded single-core system, no possibility of a race-access to this
+        // static mut. There is no danger of an interrupt accessing this global,
+        // since this global has no visibility outside this function.
+        if unsafe { !SINGLETON_TAKEN } {
+            unsafe {
+                SINGLETON_TAKEN = true;
+            }
+            Self::init(baud_rate);
+            Ok(Self { baud_rate })
+        } else {
+            Err(Error::SingletonAlreadyTaken)
+        }
     }
 
     fn init(baud_rate: u32) {
@@ -130,20 +131,6 @@ impl Serial {
         let mut udr = Register::<regs::UDR0>::new();
         // SAFETY: We can write whatever we want here, all u8's are legal.
         unsafe { udr.write_reg(byte) };
-        Ok(())
-    }
-}
-
-impl Write for Serial {
-    fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        let s = s.as_bytes();
-        for b in s {
-            match self.write(*b) {
-                Ok(()) => {}
-                Err(_) => return Err(Error),
-            }
-        }
-
         Ok(())
     }
 }
