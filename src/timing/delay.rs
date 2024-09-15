@@ -7,7 +7,7 @@ use crate::sys::{
 enum TimerPrecision {
     Imprecise,
     Precise,
-    VeryPrecise, // 1:1 with system clk
+    Exact, // 1:1 with system clk
 }
 
 impl TimerPrecision {
@@ -17,7 +17,7 @@ impl TimerPrecision {
             match self {
                 TimerPrecision::Imprecise => 0b101,
                 TimerPrecision::Precise => 0b100,
-                TimerPrecision::VeryPrecise => 0b1,
+                TimerPrecision::Exact => 0b1,
             },
         )
     }
@@ -26,7 +26,7 @@ impl TimerPrecision {
         match self {
             TimerPrecision::Imprecise => 1024,
             TimerPrecision::Precise => 256,
-            TimerPrecision::VeryPrecise => 1,
+            TimerPrecision::Exact => 1,
         }
     }
 }
