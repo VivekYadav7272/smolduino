@@ -1,5 +1,5 @@
 use crate::utils::num_traits::UnsignedNumber;
-use core::marker::PhantomData;
+use core::{marker::PhantomData, ops::BitOr};
 
 pub trait RegisterMapping {
     type RegisterType: UnsignedNumber;
@@ -60,8 +60,7 @@ impl<Reg: RegisterMapping> Register<Reg> {
     // so it's good that having to use unsafe on them feels uneasy and reminds us to create
     // a higher-level abstraction first.
     pub unsafe fn write_reg(&mut self, val: Reg::RegisterType) {
-        let bits = core::mem::size_of::<Reg::RegisterType>() as u32 * 8;
-        let mask = (1u32 << bits) - 1;
+        let mask = (1u32 << self.width()) - 1;
 
         // SAFETY: Should be fine because the mask should only be exactly as large as RegisterType.
         let mask: Reg::RegisterType = unsafe { mask.try_into().unwrap_unchecked() };
@@ -91,6 +90,14 @@ impl<Reg: RegisterMapping> Register<Reg> {
                 .unwrap_unchecked()
         }
     }
+
+    pub fn ptr(&self) -> *mut Reg::RegisterType {
+        self.reg
+    }
+
+    pub fn width(&self) -> u8 {
+        Reg::RegisterType::BITS
+    }
 }
 
 pub struct Mask<Reg: RegisterMapping> {
@@ -100,7 +107,7 @@ pub struct Mask<Reg: RegisterMapping> {
 }
 
 impl<Reg: RegisterMapping> Mask<Reg> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             val: 0,
             mask: 0,
@@ -162,5 +169,21 @@ impl<Reg: RegisterMapping> Mask<Reg> {
         let mask = self.get_mask();
         let shift = mask ^ (mask - 1);
         (shift.count_ones() - 1) as u8
+    }
+}
+
+impl<Reg: RegisterMapping> BitOr for Mask<Reg> {
+    type Output = Mask<Reg>;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        let new_mask = self.get_mask() | rhs.get_mask();
+        let new_val = self.get_val() | rhs.get_val();
+        // Rhs mask is also a Mask<Reg>, so it's logically sound
+        // that the combined mask also makes semantic sense as a Mask for Register Reg.
+        Self {
+            val: new_val,
+            mask: new_mask,
+            reg: PhantomData,
+        }
     }
 }
