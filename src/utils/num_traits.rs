@@ -22,6 +22,7 @@ pub trait UnsignedNumber:
     + TryFrom<u64>
     + TryFrom<usize>
 {
+    const BITS: u8 = core::mem::size_of::<Self>() as u8 * 8;
 }
 
 impl UnsignedNumber for u64 {}
