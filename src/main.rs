@@ -8,7 +8,7 @@ pub(crate) mod sys;
 pub mod timing;
 pub mod utils;
 
-use core::panic::PanicInfo;
+use core::{panic::PanicInfo, time::Duration};
 use core2::io::Write;
 use io::serial::Serial;
 use timing::delay;
@@ -25,6 +25,7 @@ extern "C" fn main() -> ! {
         serial
             .write_all(b"Damn this really do be workin huh\n")
             .unwrap();
-        delay::delay(500_000);
+        delay::delay(Duration::from_millis(500));
+        delay::delay(Duration::from_millis(500));
     }
 }
