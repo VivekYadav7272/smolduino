@@ -64,7 +64,8 @@ impl Serial {
             // SAFETY: U2X0 is a bitfield in UCSRA0 register, hence 1 is a valid value.
             unsafe { Mask::with_mask_val(masks::U2X0, 1).write_val() };
         } else {
-            // UBRR register only has 12 bits. So if ubrr_val >= 2^12, then we try U2X = 0 instead.
+            // UBRR register only has 12 bits. So if ubrr_val >= 2^12, then we try U2X = 0 instead
+            // (gives a smaller UBRR value).
             ubrr_val = get_ubrr_val(baud_rate, false);
         }
 
@@ -73,8 +74,8 @@ impl Serial {
         // So, you need to clear URSEL bit to indicate you're using UBRRH and NOT UCSRC.
         // |URSEL| -- | -- | -- | UBRR[11:8]| <-- UBRR0H
         // |            UBRR[7:0]           | <-- UBRR0L
-        // We shouldn't need to do this as the value calculated should NOT exceed the 12 bits provided
-        // for UBRR, meaning URSEL should already be zero. But doing it explicitly is better than not doing it.
+        // We shouldn't need to do this as URSEL should already be zero.
+        // But doing it explicitly is better than not doing it.
         let ubrr_val = ubrr_val & !0x8000;
 
         let mut ubrr = Register::<regs::UBRR0>::new();
@@ -111,11 +112,11 @@ impl Serial {
         // SAFETY: Mask has legal values bruv
         unsafe {
             ucsrc_val
-                // set URSEL bit (7) to 1 (because URSEL=0 implies we're dealing with UBRR0H)
+                // (URSEL0 and UMSEL0 have the same mask, := 0xC0)
+                // set URSEL bit to 1 (because URSEL=0 implies we're dealing with UBRR0H)
                 // leave UMSEL bit to 0
-                // (URSEL0's mask is also UMSEL0, := 0xC0)
                 .add_mask_val(masks::UMSEL0, 0b10)
-                // leave both UPM bits as parity as of now is not required
+                // leave both UPM bits as 0 since parity as of now is not required
                 // leave USBS (bit 3) to 0 since we want 1 stop bit
                 // set UCSZ to 0b11 to show we want a packet to be 8-bits long.
                 .add_mask_val(masks::UCSZ0, 0b11)
