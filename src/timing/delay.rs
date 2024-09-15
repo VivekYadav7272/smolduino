@@ -5,6 +5,7 @@ use crate::sys::{
 };
 
 enum TimerPrecision {
+    Zero, // No clk
     Imprecise,
     Precise,
     Exact, // 1:1 with system clk
@@ -18,6 +19,7 @@ impl TimerPrecision {
                 TimerPrecision::Imprecise => 0b101,
                 TimerPrecision::Precise => 0b100,
                 TimerPrecision::Exact => 0b1,
+                TimerPrecision::Zero => 0,
             },
         )
     }
@@ -27,7 +29,12 @@ impl TimerPrecision {
             TimerPrecision::Imprecise => 1024,
             TimerPrecision::Precise => 256,
             TimerPrecision::Exact => 1,
+            TimerPrecision::Zero => u32::MAX, // Should be infinite, as it scales your clk to zero.
         }
+    }
+
+    pub fn scaled_clk(&self) -> u32 {
+        sys::F_CPU / self.prescale_factor()
     }
 }
 /**
@@ -46,9 +53,7 @@ pub fn delay(duration: core::time::Duration) {
     // that anything less than 1ms, is likely not gonna be accurately delayed.
     // MAYBE we do that in future.
     let precision = TimerPrecision::Imprecise; //get_prescaler(delay_millis);
-    let scaled_clk = sys::F_CPU / precision.prescale_factor();
-    // find out how many clks to "sleep" for.
-    let num_ticks = (scaled_clk as u128 * delay_millis) / 1000;
+    let num_ticks = (precision.scaled_clk() as u128 * delay_millis) / 1000;
     _delay_ticks(num_ticks, precision)
 }
 
@@ -81,4 +86,7 @@ fn _delay_ticks(ticks: u128, precision: TimerPrecision) {
 
     // SAFETY: Overflow is reset to zero, by writing a logical one to it (weird ikr).
     unsafe { counter_overflow_bit.write_val() };
+
+    // Don't forget to disconnect clock! Or it will keep counting!
+    unsafe { TimerPrecision::Zero.timer_mask().write_val() };
 }
