@@ -41,8 +41,7 @@ impl TimerPrecision {
  * No time calculation. Just sleep for `ticks` amount of ticks.
  */
 pub fn delay_ticks(ticks: u128) {
-    // Scale clock down by a factor of 1024. (i.e 1024 system ticks == 1 timer tick)
-    _delay_ticks(ticks, TimerPrecision::Imprecise)
+    _delay_ticks(ticks, TimerPrecision::Exact)
 }
 
 pub fn delay(duration: core::time::Duration) {
