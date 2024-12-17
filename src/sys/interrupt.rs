@@ -1,11 +1,44 @@
+use core::arch::asm;
+
 /*
- * Scrapping this timer module. Feels like a _time_ ;) sink to implement.
- * Rather, I'll directly implement interrupts instead of this, like so:
- * struct Interrupt {
- *  trigger: InterruptTrigger,
- *  callback: impl Fn() -> () + 'static,
- * }
- * (something like this, not exact syntax)
- * in this way, I can probably abstract over needing a timer inside the InterruptTrigger (struct? enum?) and
- * special-case it.
-*/
+Todo:
+- Implement Interrupts
+- Implement Cell/RefCell analogues for AVR (basically clearing interrupts for "atomic" operations)
+- Write a setTimeout/setInterval function that utilises this API.
+ */
+
+fn enable_intr() {
+    unsafe {
+        asm!("sei");
+    }
+}
+
+fn disable_intr() {
+    unsafe {
+        asm!("cli");
+    }
+}
+// Nice, atmega328 already clears the 'I' bit when serving an interrupt,
+// so we don't need to worry if another interrupt might interrupt our interrupt.
+pub struct Interrupt<T: Fn() -> ()> {
+    trigger: TriggerType,
+    callback: T,
+}
+
+impl<T: Fn() -> ()> Interrupt<T> {
+    pub fn new(trigger: TriggerType, callback: T) -> Self {
+        Self { trigger, callback }
+    }
+
+    pub fn enable(&mut self) {
+        // depending on different TriggerTypes, enable that specific Trigger's interrupt.
+        let intr_bit_mask = self.trigger.intr_bit_mask();
+    }
+}
+
+pub enum TriggerType {}
+impl TriggerType {
+    pub fn intr_bit_mask(&self) -> u8 {
+        todo!("match on the specific kinda interrupt and return the bit mask accordingly")
+    }
+}
