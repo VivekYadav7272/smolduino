@@ -4,6 +4,7 @@ use crate::sys::{
     reg_io::{Mask, Register},
 };
 
+#[derive(Debug, Clone, Copy)]
 enum TimerPrecision {
     Zero, // No clk
     Imprecise,
@@ -45,15 +46,20 @@ pub fn delay_ticks(ticks: u128) {
 }
 
 pub fn delay(duration: core::time::Duration) {
-    let delay_millis = duration.as_millis();
-
     // I was initially going to have different pre-scaling options
     // based on the delay given. But it sounds like there's enough code involved,
     // that anything less than 1ms, is likely not gonna be accurately delayed.
     // MAYBE we do that in future.
     let precision = TimerPrecision::Imprecise; //get_prescaler(delay_millis);
-    let num_ticks = (precision.scaled_clk() as u128 * delay_millis) / 1000;
+    let num_ticks = duration2ticks(duration, precision);
     _delay_ticks(num_ticks, precision)
+}
+
+fn duration2ticks(duration: core::time::Duration, precision: TimerPrecision) -> u128 {
+    let delay_millis = duration.as_millis();
+    let num_ticks = (precision.scaled_clk() as u128 * delay_millis) / 1000;
+
+    num_ticks
 }
 
 fn _delay_ticks(ticks: u128, precision: TimerPrecision) {

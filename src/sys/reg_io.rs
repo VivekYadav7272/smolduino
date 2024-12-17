@@ -1,12 +1,16 @@
 use crate::utils::num_traits::UnsignedNumber;
 use core::{marker::PhantomData, ops::BitOr};
 
-pub trait RegisterMapping {
+pub(super) mod private {
+    pub trait Sealed {}
+}
+
+pub trait RegisterMapping: private::Sealed {
     type RegisterType: UnsignedNumber;
     fn get_reg_addr() -> *mut Self::RegisterType;
 }
 
-pub trait MaskMapping {
+pub trait MaskMapping: private::Sealed {
     type Register: RegisterMapping;
 
     // Technically, mask's type should be RegisterType, but all masks are actually just word-sized (u8)
