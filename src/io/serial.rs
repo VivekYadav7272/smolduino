@@ -1,5 +1,3 @@
-use core::convert::Infallible;
-
 use crate::{
     error::Error,
     sys::{
@@ -7,11 +5,12 @@ use crate::{
         mappings::{masks, regs},
         reg_io::{Mask, Register},
     },
+    utils::sync::SyncCell,
 };
 
 use core2::io;
 
-static mut SINGLETON_TAKEN: bool = false;
+static SINGLETON_TAKEN: SyncCell<bool> = SyncCell::new(false);
 /**
  * Utilises the hardware UART capabilities of Atmega328p to do serial communication.
  */
@@ -23,19 +22,8 @@ impl Serial {
     // Max baud rate possible is 1Mbps. Upon request of a higher baud rate,
     // it will automatically saturate to 1Mbps (UBRR = 0).
     pub fn with_baud_rate(baud_rate: u32) -> Result<Self, Error> {
-        // TODO: Re-implement synchronisation primtives like Cell<T> and RefCell<T>
-        // and guard against re-entrancy via interrupts. Then implement Sync for them
-        // (really the only form of "race condition" we can encounter so they are Sync)
-        // if they are guarded against interrupts.
-        // THEN, we just use a Cell<bool> instead.
-
-        // SAFETY: We're a single-threaded single-core system, no possibility of a race-access to this
-        // static mut. The global is only visible in this translation unit, so if no interrupts
-        // use the global in this file, it's safe to read/write to this global.
-        if unsafe { !SINGLETON_TAKEN } {
-            unsafe {
-                SINGLETON_TAKEN = true;
-            }
+        if !SINGLETON_TAKEN.get() {
+            SINGLETON_TAKEN.set(true);
             Self::init(baud_rate);
             Ok(Self { baud_rate })
         } else {
@@ -143,9 +131,7 @@ impl Serial {
 impl Drop for Serial {
     fn drop(&mut self) {
         // SAFETY: Same safety concerns as the usage in Self::with_baud_rate
-        unsafe {
-            SINGLETON_TAKEN = false;
-        }
+        SINGLETON_TAKEN.set(false);
     }
 }
 
