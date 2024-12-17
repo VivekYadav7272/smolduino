@@ -1,8 +1,10 @@
 #![allow(non_camel_case_types)]
-use super::reg_io::{MaskMapping, RegisterMapping};
+use super::reg_io::private::Sealed;
+use super::reg_io::MaskMapping;
 use avrd::current as inner;
 
 pub struct ACO;
+impl Sealed for ACO {}
 impl MaskMapping for ACO {
     type Register = super::mappings::regs::ACSR;
 
@@ -12,6 +14,7 @@ impl MaskMapping for ACO {
 }
 
 pub struct ACIS;
+impl Sealed for ACIS {}
 impl MaskMapping for ACIS {
     type Register = super::mappings::regs::ACSR;
 
@@ -21,6 +24,7 @@ impl MaskMapping for ACIS {
 }
 
 pub struct ACD;
+impl Sealed for ACD {}
 impl MaskMapping for ACD {
     type Register = super::mappings::regs::ACSR;
 
@@ -30,6 +34,7 @@ impl MaskMapping for ACD {
 }
 
 pub struct ACIE;
+impl Sealed for ACIE {}
 impl MaskMapping for ACIE {
     type Register = super::mappings::regs::ACSR;
 
@@ -39,6 +44,7 @@ impl MaskMapping for ACIE {
 }
 
 pub struct ADIE;
+impl Sealed for ADIE {}
 impl MaskMapping for ADIE {
     type Register = super::mappings::regs::ADCSRA;
 
@@ -48,6 +54,7 @@ impl MaskMapping for ADIE {
 }
 
 pub struct ADSC;
+impl Sealed for ADSC {}
 impl MaskMapping for ADSC {
     type Register = super::mappings::regs::ADCSRA;
 
@@ -57,6 +64,7 @@ impl MaskMapping for ADSC {
 }
 
 pub struct ADPS;
+impl Sealed for ADPS {}
 impl MaskMapping for ADPS {
     type Register = super::mappings::regs::ADCSRA;
 
@@ -66,6 +74,7 @@ impl MaskMapping for ADPS {
 }
 
 pub struct ADIF;
+impl Sealed for ADIF {}
 impl MaskMapping for ADIF {
     type Register = super::mappings::regs::ADCSRA;
 
@@ -75,6 +84,7 @@ impl MaskMapping for ADIF {
 }
 
 pub struct ADEN;
+impl Sealed for ADEN {}
 impl MaskMapping for ADEN {
     type Register = super::mappings::regs::ADCSRA;
 
@@ -84,6 +94,7 @@ impl MaskMapping for ADEN {
 }
 
 pub struct ADATE;
+impl Sealed for ADATE {}
 impl MaskMapping for ADATE {
     type Register = super::mappings::regs::ADCSRA;
 
@@ -93,6 +104,7 @@ impl MaskMapping for ADATE {
 }
 
 pub struct ACME;
+impl Sealed for ACME {}
 impl MaskMapping for ACME {
     type Register = super::mappings::regs::ADCSRB;
 
@@ -102,6 +114,7 @@ impl MaskMapping for ACME {
 }
 
 pub struct ADTS;
+impl Sealed for ADTS {}
 impl MaskMapping for ADTS {
     type Register = super::mappings::regs::ADCSRB;
 
@@ -111,6 +124,7 @@ impl MaskMapping for ADTS {
 }
 
 pub struct REFS;
+impl Sealed for REFS {}
 impl MaskMapping for REFS {
     type Register = super::mappings::regs::ADMUX;
 
@@ -120,6 +134,7 @@ impl MaskMapping for REFS {
 }
 
 pub struct ADLAR;
+impl Sealed for ADLAR {}
 impl MaskMapping for ADLAR {
     type Register = super::mappings::regs::ADMUX;
 
@@ -129,6 +144,7 @@ impl MaskMapping for ADLAR {
 }
 
 pub struct MUX;
+impl Sealed for MUX {}
 impl MaskMapping for MUX {
     type Register = super::mappings::regs::ADMUX;
 
@@ -138,6 +154,7 @@ impl MaskMapping for MUX {
 }
 
 pub struct TCN2UB;
+impl Sealed for TCN2UB {}
 impl MaskMapping for TCN2UB {
     type Register = super::mappings::regs::ASSR;
 
@@ -147,6 +164,7 @@ impl MaskMapping for TCN2UB {
 }
 
 pub struct OCR2BUB;
+impl Sealed for OCR2BUB {}
 impl MaskMapping for OCR2BUB {
     type Register = super::mappings::regs::ASSR;
 
@@ -156,6 +174,7 @@ impl MaskMapping for OCR2BUB {
 }
 
 pub struct AS2;
+impl Sealed for AS2 {}
 impl MaskMapping for AS2 {
     type Register = super::mappings::regs::ASSR;
 
@@ -165,6 +184,7 @@ impl MaskMapping for AS2 {
 }
 
 pub struct EXCLK;
+impl Sealed for EXCLK {}
 impl MaskMapping for EXCLK {
     type Register = super::mappings::regs::ASSR;
 
@@ -174,6 +194,7 @@ impl MaskMapping for EXCLK {
 }
 
 pub struct OCR2AUB;
+impl Sealed for OCR2AUB {}
 impl MaskMapping for OCR2AUB {
     type Register = super::mappings::regs::ASSR;
 
@@ -183,6 +204,7 @@ impl MaskMapping for OCR2AUB {
 }
 
 pub struct TCR2AUB;
+impl Sealed for TCR2AUB {}
 impl MaskMapping for TCR2AUB {
     type Register = super::mappings::regs::ASSR;
 
@@ -192,6 +214,7 @@ impl MaskMapping for TCR2AUB {
 }
 
 pub struct TCR2BUB;
+impl Sealed for TCR2BUB {}
 impl MaskMapping for TCR2BUB {
     type Register = super::mappings::regs::ASSR;
 
@@ -201,6 +224,7 @@ impl MaskMapping for TCR2BUB {
 }
 
 pub struct CLKPCE;
+impl Sealed for CLKPCE {}
 impl MaskMapping for CLKPCE {
     type Register = super::mappings::regs::CLKPR;
 
@@ -210,6 +234,7 @@ impl MaskMapping for CLKPCE {
 }
 
 pub struct CLKPS;
+impl Sealed for CLKPS {}
 impl MaskMapping for CLKPS {
     type Register = super::mappings::regs::CLKPR;
 
@@ -219,6 +244,7 @@ impl MaskMapping for CLKPS {
 }
 
 pub struct ADC0D;
+impl Sealed for ADC0D {}
 impl MaskMapping for ADC0D {
     type Register = super::mappings::regs::DIDR0;
 
@@ -228,6 +254,7 @@ impl MaskMapping for ADC0D {
 }
 
 pub struct ADC2D;
+impl Sealed for ADC2D {}
 impl MaskMapping for ADC2D {
     type Register = super::mappings::regs::DIDR0;
 
@@ -237,6 +264,7 @@ impl MaskMapping for ADC2D {
 }
 
 pub struct ADC4D;
+impl Sealed for ADC4D {}
 impl MaskMapping for ADC4D {
     type Register = super::mappings::regs::DIDR0;
 
@@ -246,6 +274,7 @@ impl MaskMapping for ADC4D {
 }
 
 pub struct ADC5D;
+impl Sealed for ADC5D {}
 impl MaskMapping for ADC5D {
     type Register = super::mappings::regs::DIDR0;
 
@@ -255,6 +284,7 @@ impl MaskMapping for ADC5D {
 }
 
 pub struct ADC1D;
+impl Sealed for ADC1D {}
 impl MaskMapping for ADC1D {
     type Register = super::mappings::regs::DIDR0;
 
@@ -264,6 +294,7 @@ impl MaskMapping for ADC1D {
 }
 
 pub struct ADC3D;
+impl Sealed for ADC3D {}
 impl MaskMapping for ADC3D {
     type Register = super::mappings::regs::DIDR0;
 
@@ -273,6 +304,7 @@ impl MaskMapping for ADC3D {
 }
 
 pub struct AIN1D;
+impl Sealed for AIN1D {}
 impl MaskMapping for AIN1D {
     type Register = super::mappings::regs::DIDR1;
 
@@ -282,6 +314,7 @@ impl MaskMapping for AIN1D {
 }
 
 pub struct AIN0D;
+impl Sealed for AIN0D {}
 impl MaskMapping for AIN0D {
     type Register = super::mappings::regs::DIDR1;
 
@@ -291,6 +324,7 @@ impl MaskMapping for AIN0D {
 }
 
 pub struct EEMPE;
+impl Sealed for EEMPE {}
 impl MaskMapping for EEMPE {
     type Register = super::mappings::regs::EECR;
 
@@ -300,6 +334,7 @@ impl MaskMapping for EEMPE {
 }
 
 pub struct EEPM;
+impl Sealed for EEPM {}
 impl MaskMapping for EEPM {
     type Register = super::mappings::regs::EECR;
 
@@ -309,6 +344,7 @@ impl MaskMapping for EEPM {
 }
 
 pub struct EERIE;
+impl Sealed for EERIE {}
 impl MaskMapping for EERIE {
     type Register = super::mappings::regs::EECR;
 
@@ -318,6 +354,7 @@ impl MaskMapping for EERIE {
 }
 
 pub struct EERE;
+impl Sealed for EERE {}
 impl MaskMapping for EERE {
     type Register = super::mappings::regs::EECR;
 
@@ -327,6 +364,7 @@ impl MaskMapping for EERE {
 }
 
 pub struct EEPE;
+impl Sealed for EEPE {}
 impl MaskMapping for EEPE {
     type Register = super::mappings::regs::EECR;
 
@@ -336,6 +374,7 @@ impl MaskMapping for EEPE {
 }
 
 pub struct ISC1;
+impl Sealed for ISC1 {}
 impl MaskMapping for ISC1 {
     type Register = super::mappings::regs::EICRA;
 
@@ -345,6 +384,7 @@ impl MaskMapping for ISC1 {
 }
 
 pub struct ISC0;
+impl Sealed for ISC0 {}
 impl MaskMapping for ISC0 {
     type Register = super::mappings::regs::EICRA;
 
@@ -354,6 +394,7 @@ impl MaskMapping for ISC0 {
 }
 
 pub struct INTF;
+impl Sealed for INTF {}
 impl MaskMapping for INTF {
     type Register = super::mappings::regs::EIFR;
 
@@ -363,6 +404,7 @@ impl MaskMapping for INTF {
 }
 
 pub struct INT;
+impl Sealed for INT {}
 impl MaskMapping for INT {
     type Register = super::mappings::regs::EIMSK;
 
@@ -372,6 +414,7 @@ impl MaskMapping for INT {
 }
 
 pub struct BODLEVEL;
+impl Sealed for BODLEVEL {}
 impl MaskMapping for BODLEVEL {
     type Register = super::mappings::regs::EXTENDED;
 
@@ -381,6 +424,7 @@ impl MaskMapping for BODLEVEL {
 }
 
 pub struct TSM;
+impl Sealed for TSM {}
 impl MaskMapping for TSM {
     type Register = super::mappings::regs::GTCCR;
 
@@ -390,6 +434,7 @@ impl MaskMapping for TSM {
 }
 
 pub struct PSRSYNC;
+impl Sealed for PSRSYNC {}
 impl MaskMapping for PSRSYNC {
     type Register = super::mappings::regs::GTCCR;
 
@@ -399,6 +444,7 @@ impl MaskMapping for PSRSYNC {
 }
 
 pub struct BOOTRST;
+impl Sealed for BOOTRST {}
 impl MaskMapping for BOOTRST {
     type Register = super::mappings::regs::HIGH;
 
@@ -408,6 +454,7 @@ impl MaskMapping for BOOTRST {
 }
 
 pub struct BOOTSZ;
+impl Sealed for BOOTSZ {}
 impl MaskMapping for BOOTSZ {
     type Register = super::mappings::regs::HIGH;
 
@@ -417,6 +464,7 @@ impl MaskMapping for BOOTSZ {
 }
 
 pub struct DWEN;
+impl Sealed for DWEN {}
 impl MaskMapping for DWEN {
     type Register = super::mappings::regs::HIGH;
 
@@ -426,6 +474,7 @@ impl MaskMapping for DWEN {
 }
 
 pub struct WDTON;
+impl Sealed for WDTON {}
 impl MaskMapping for WDTON {
     type Register = super::mappings::regs::HIGH;
 
@@ -435,6 +484,7 @@ impl MaskMapping for WDTON {
 }
 
 pub struct RSTDISBL;
+impl Sealed for RSTDISBL {}
 impl MaskMapping for RSTDISBL {
     type Register = super::mappings::regs::HIGH;
 
@@ -444,6 +494,7 @@ impl MaskMapping for RSTDISBL {
 }
 
 pub struct EESAVE;
+impl Sealed for EESAVE {}
 impl MaskMapping for EESAVE {
     type Register = super::mappings::regs::HIGH;
 
@@ -453,6 +504,7 @@ impl MaskMapping for EESAVE {
 }
 
 pub struct SPIEN;
+impl Sealed for SPIEN {}
 impl MaskMapping for SPIEN {
     type Register = super::mappings::regs::HIGH;
 
@@ -462,6 +514,7 @@ impl MaskMapping for SPIEN {
 }
 
 pub struct LB;
+impl Sealed for LB {}
 impl MaskMapping for LB {
     type Register = super::mappings::regs::LOCKBIT;
 
@@ -471,6 +524,7 @@ impl MaskMapping for LB {
 }
 
 pub struct BLB0;
+impl Sealed for BLB0 {}
 impl MaskMapping for BLB0 {
     type Register = super::mappings::regs::LOCKBIT;
 
@@ -480,6 +534,7 @@ impl MaskMapping for BLB0 {
 }
 
 pub struct BLB1;
+impl Sealed for BLB1 {}
 impl MaskMapping for BLB1 {
     type Register = super::mappings::regs::LOCKBIT;
 
@@ -489,6 +544,7 @@ impl MaskMapping for BLB1 {
 }
 
 pub struct SUT_CKSEL;
+impl Sealed for SUT_CKSEL {}
 impl MaskMapping for SUT_CKSEL {
     type Register = super::mappings::regs::LOW;
 
@@ -498,6 +554,7 @@ impl MaskMapping for SUT_CKSEL {
 }
 
 pub struct CKDIV8;
+impl Sealed for CKDIV8 {}
 impl MaskMapping for CKDIV8 {
     type Register = super::mappings::regs::LOW;
 
@@ -507,6 +564,7 @@ impl MaskMapping for CKDIV8 {
 }
 
 pub struct CKOUT;
+impl Sealed for CKOUT {}
 impl MaskMapping for CKOUT {
     type Register = super::mappings::regs::LOW;
 
@@ -516,6 +574,7 @@ impl MaskMapping for CKOUT {
 }
 
 pub struct BODSE;
+impl Sealed for BODSE {}
 impl MaskMapping for BODSE {
     type Register = super::mappings::regs::MCUCR;
 
@@ -525,6 +584,7 @@ impl MaskMapping for BODSE {
 }
 
 pub struct IVSEL;
+impl Sealed for IVSEL {}
 impl MaskMapping for IVSEL {
     type Register = super::mappings::regs::MCUCR;
 
@@ -534,6 +594,7 @@ impl MaskMapping for IVSEL {
 }
 
 pub struct PUD;
+impl Sealed for PUD {}
 impl MaskMapping for PUD {
     type Register = super::mappings::regs::MCUCR;
 
@@ -543,6 +604,7 @@ impl MaskMapping for PUD {
 }
 
 pub struct IVCE;
+impl Sealed for IVCE {}
 impl MaskMapping for IVCE {
     type Register = super::mappings::regs::MCUCR;
 
@@ -552,6 +614,7 @@ impl MaskMapping for IVCE {
 }
 
 pub struct BODS;
+impl Sealed for BODS {}
 impl MaskMapping for BODS {
     type Register = super::mappings::regs::MCUCR;
 
@@ -561,6 +624,7 @@ impl MaskMapping for BODS {
 }
 
 pub struct EXTRF;
+impl Sealed for EXTRF {}
 impl MaskMapping for EXTRF {
     type Register = super::mappings::regs::MCUSR;
 
@@ -570,6 +634,7 @@ impl MaskMapping for EXTRF {
 }
 
 pub struct WDRF;
+impl Sealed for WDRF {}
 impl MaskMapping for WDRF {
     type Register = super::mappings::regs::MCUSR;
 
@@ -579,6 +644,7 @@ impl MaskMapping for WDRF {
 }
 
 pub struct PORF;
+impl Sealed for PORF {}
 impl MaskMapping for PORF {
     type Register = super::mappings::regs::MCUSR;
 
@@ -588,6 +654,7 @@ impl MaskMapping for PORF {
 }
 
 pub struct BORF;
+impl Sealed for BORF {}
 impl MaskMapping for BORF {
     type Register = super::mappings::regs::MCUSR;
 
@@ -597,6 +664,7 @@ impl MaskMapping for BORF {
 }
 
 pub struct PCIE;
+impl Sealed for PCIE {}
 impl MaskMapping for PCIE {
     type Register = super::mappings::regs::PCICR;
 
@@ -606,6 +674,7 @@ impl MaskMapping for PCIE {
 }
 
 pub struct PCIF;
+impl Sealed for PCIF {}
 impl MaskMapping for PCIF {
     type Register = super::mappings::regs::PCIFR;
 
@@ -615,6 +684,7 @@ impl MaskMapping for PCIF {
 }
 
 pub struct PRTIM2;
+impl Sealed for PRTIM2 {}
 impl MaskMapping for PRTIM2 {
     type Register = super::mappings::regs::PRR;
 
@@ -624,6 +694,7 @@ impl MaskMapping for PRTIM2 {
 }
 
 pub struct PRTIM0;
+impl Sealed for PRTIM0 {}
 impl MaskMapping for PRTIM0 {
     type Register = super::mappings::regs::PRR;
 
@@ -633,6 +704,7 @@ impl MaskMapping for PRTIM0 {
 }
 
 pub struct PRSPI;
+impl Sealed for PRSPI {}
 impl MaskMapping for PRSPI {
     type Register = super::mappings::regs::PRR;
 
@@ -642,6 +714,7 @@ impl MaskMapping for PRSPI {
 }
 
 pub struct PRADC;
+impl Sealed for PRADC {}
 impl MaskMapping for PRADC {
     type Register = super::mappings::regs::PRR;
 
@@ -651,6 +724,7 @@ impl MaskMapping for PRADC {
 }
 
 pub struct PRTIM1;
+impl Sealed for PRTIM1 {}
 impl MaskMapping for PRTIM1 {
     type Register = super::mappings::regs::PRR;
 
@@ -660,6 +734,7 @@ impl MaskMapping for PRTIM1 {
 }
 
 pub struct PRTWI;
+impl Sealed for PRTWI {}
 impl MaskMapping for PRTWI {
     type Register = super::mappings::regs::PRR;
 
@@ -669,6 +744,7 @@ impl MaskMapping for PRTWI {
 }
 
 pub struct PRUSART0;
+impl Sealed for PRUSART0 {}
 impl MaskMapping for PRUSART0 {
     type Register = super::mappings::regs::PRR;
 
@@ -678,6 +754,7 @@ impl MaskMapping for PRUSART0 {
 }
 
 pub struct SM;
+impl Sealed for SM {}
 impl MaskMapping for SM {
     type Register = super::mappings::regs::SMCR;
 
@@ -687,6 +764,7 @@ impl MaskMapping for SM {
 }
 
 pub struct SE;
+impl Sealed for SE {}
 impl MaskMapping for SE {
     type Register = super::mappings::regs::SMCR;
 
@@ -696,6 +774,7 @@ impl MaskMapping for SE {
 }
 
 pub struct SPIE;
+impl Sealed for SPIE {}
 impl MaskMapping for SPIE {
     type Register = super::mappings::regs::SPCR;
 
@@ -705,6 +784,7 @@ impl MaskMapping for SPIE {
 }
 
 pub struct DORD;
+impl Sealed for DORD {}
 impl MaskMapping for DORD {
     type Register = super::mappings::regs::SPCR;
 
@@ -714,6 +794,7 @@ impl MaskMapping for DORD {
 }
 
 pub struct SPR;
+impl Sealed for SPR {}
 impl MaskMapping for SPR {
     type Register = super::mappings::regs::SPCR;
 
@@ -723,6 +804,7 @@ impl MaskMapping for SPR {
 }
 
 pub struct CPHA;
+impl Sealed for CPHA {}
 impl MaskMapping for CPHA {
     type Register = super::mappings::regs::SPCR;
 
@@ -732,6 +814,7 @@ impl MaskMapping for CPHA {
 }
 
 pub struct MSTR;
+impl Sealed for MSTR {}
 impl MaskMapping for MSTR {
     type Register = super::mappings::regs::SPCR;
 
@@ -741,6 +824,7 @@ impl MaskMapping for MSTR {
 }
 
 pub struct SPE;
+impl Sealed for SPE {}
 impl MaskMapping for SPE {
     type Register = super::mappings::regs::SPCR;
 
@@ -750,6 +834,7 @@ impl MaskMapping for SPE {
 }
 
 pub struct CPOL;
+impl Sealed for CPOL {}
 impl MaskMapping for CPOL {
     type Register = super::mappings::regs::SPCR;
 
@@ -759,6 +844,7 @@ impl MaskMapping for CPOL {
 }
 
 pub struct PGWRT;
+impl Sealed for PGWRT {}
 impl MaskMapping for PGWRT {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -768,6 +854,7 @@ impl MaskMapping for PGWRT {
 }
 
 pub struct SIGRD;
+impl Sealed for SIGRD {}
 impl MaskMapping for SIGRD {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -777,6 +864,7 @@ impl MaskMapping for SIGRD {
 }
 
 pub struct BLBSET;
+impl Sealed for BLBSET {}
 impl MaskMapping for BLBSET {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -786,6 +874,7 @@ impl MaskMapping for BLBSET {
 }
 
 pub struct RWWSB;
+impl Sealed for RWWSB {}
 impl MaskMapping for RWWSB {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -795,6 +884,7 @@ impl MaskMapping for RWWSB {
 }
 
 pub struct SPMIE;
+impl Sealed for SPMIE {}
 impl MaskMapping for SPMIE {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -804,6 +894,7 @@ impl MaskMapping for SPMIE {
 }
 
 pub struct SPMEN;
+impl Sealed for SPMEN {}
 impl MaskMapping for SPMEN {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -813,6 +904,7 @@ impl MaskMapping for SPMEN {
 }
 
 pub struct RWWSRE;
+impl Sealed for RWWSRE {}
 impl MaskMapping for RWWSRE {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -822,6 +914,7 @@ impl MaskMapping for RWWSRE {
 }
 
 pub struct PGERS;
+impl Sealed for PGERS {}
 impl MaskMapping for PGERS {
     type Register = super::mappings::regs::SPMCSR;
 
@@ -831,6 +924,7 @@ impl MaskMapping for PGERS {
 }
 
 pub struct WCOL;
+impl Sealed for WCOL {}
 impl MaskMapping for WCOL {
     type Register = super::mappings::regs::SPSR;
 
@@ -840,6 +934,7 @@ impl MaskMapping for WCOL {
 }
 
 pub struct SPI2X;
+impl Sealed for SPI2X {}
 impl MaskMapping for SPI2X {
     type Register = super::mappings::regs::SPSR;
 
@@ -849,6 +944,7 @@ impl MaskMapping for SPI2X {
 }
 
 pub struct SPIF;
+impl Sealed for SPIF {}
 impl MaskMapping for SPIF {
     type Register = super::mappings::regs::SPSR;
 
@@ -858,6 +954,7 @@ impl MaskMapping for SPIF {
 }
 
 pub struct V;
+impl Sealed for V {}
 impl MaskMapping for V {
     type Register = super::mappings::regs::SREG;
 
@@ -867,6 +964,7 @@ impl MaskMapping for V {
 }
 
 pub struct T;
+impl Sealed for T {}
 impl MaskMapping for T {
     type Register = super::mappings::regs::SREG;
 
@@ -876,6 +974,7 @@ impl MaskMapping for T {
 }
 
 pub struct S;
+impl Sealed for S {}
 impl MaskMapping for S {
     type Register = super::mappings::regs::SREG;
 
@@ -885,6 +984,7 @@ impl MaskMapping for S {
 }
 
 pub struct N;
+impl Sealed for N {}
 impl MaskMapping for N {
     type Register = super::mappings::regs::SREG;
 
@@ -894,6 +994,7 @@ impl MaskMapping for N {
 }
 
 pub struct I;
+impl Sealed for I {}
 impl MaskMapping for I {
     type Register = super::mappings::regs::SREG;
 
@@ -903,6 +1004,7 @@ impl MaskMapping for I {
 }
 
 pub struct C;
+impl Sealed for C {}
 impl MaskMapping for C {
     type Register = super::mappings::regs::SREG;
 
@@ -912,6 +1014,7 @@ impl MaskMapping for C {
 }
 
 pub struct H;
+impl Sealed for H {}
 impl MaskMapping for H {
     type Register = super::mappings::regs::SREG;
 
@@ -921,6 +1024,7 @@ impl MaskMapping for H {
 }
 
 pub struct Z;
+impl Sealed for Z {}
 impl MaskMapping for Z {
     type Register = super::mappings::regs::SREG;
 
@@ -930,6 +1034,7 @@ impl MaskMapping for Z {
 }
 
 pub struct COM0A;
+impl Sealed for COM0A {}
 impl MaskMapping for COM0A {
     type Register = super::mappings::regs::TCCR0A;
 
@@ -939,6 +1044,7 @@ impl MaskMapping for COM0A {
 }
 
 pub struct WGM0;
+impl Sealed for WGM0 {}
 impl MaskMapping for WGM0 {
     type Register = super::mappings::regs::TCCR0A;
 
@@ -948,6 +1054,7 @@ impl MaskMapping for WGM0 {
 }
 
 pub struct COM0B;
+impl Sealed for COM0B {}
 impl MaskMapping for COM0B {
     type Register = super::mappings::regs::TCCR0A;
 
@@ -957,6 +1064,7 @@ impl MaskMapping for COM0B {
 }
 
 pub struct CS0;
+impl Sealed for CS0 {}
 impl MaskMapping for CS0 {
     type Register = super::mappings::regs::TCCR0B;
 
@@ -966,6 +1074,7 @@ impl MaskMapping for CS0 {
 }
 
 pub struct WGM02;
+impl Sealed for WGM02 {}
 impl MaskMapping for WGM02 {
     type Register = super::mappings::regs::TCCR0B;
 
@@ -975,6 +1084,7 @@ impl MaskMapping for WGM02 {
 }
 
 pub struct FOC0B;
+impl Sealed for FOC0B {}
 impl MaskMapping for FOC0B {
     type Register = super::mappings::regs::TCCR0B;
 
@@ -984,6 +1094,7 @@ impl MaskMapping for FOC0B {
 }
 
 pub struct FOC0A;
+impl Sealed for FOC0A {}
 impl MaskMapping for FOC0A {
     type Register = super::mappings::regs::TCCR0B;
 
@@ -993,6 +1104,7 @@ impl MaskMapping for FOC0A {
 }
 
 pub struct COM1A;
+impl Sealed for COM1A {}
 impl MaskMapping for COM1A {
     type Register = super::mappings::regs::TCCR1A;
 
@@ -1002,6 +1114,7 @@ impl MaskMapping for COM1A {
 }
 
 pub struct COM1B;
+impl Sealed for COM1B {}
 impl MaskMapping for COM1B {
     type Register = super::mappings::regs::TCCR1A;
 
@@ -1011,6 +1124,7 @@ impl MaskMapping for COM1B {
 }
 
 pub struct ICES1;
+impl Sealed for ICES1 {}
 impl MaskMapping for ICES1 {
     type Register = super::mappings::regs::TCCR1B;
 
@@ -1020,6 +1134,7 @@ impl MaskMapping for ICES1 {
 }
 
 pub struct ICNC1;
+impl Sealed for ICNC1 {}
 impl MaskMapping for ICNC1 {
     type Register = super::mappings::regs::TCCR1B;
 
@@ -1029,6 +1144,7 @@ impl MaskMapping for ICNC1 {
 }
 
 pub struct CS1;
+impl Sealed for CS1 {}
 impl MaskMapping for CS1 {
     type Register = super::mappings::regs::TCCR1B;
 
@@ -1038,6 +1154,7 @@ impl MaskMapping for CS1 {
 }
 
 pub struct FOC1A;
+impl Sealed for FOC1A {}
 impl MaskMapping for FOC1A {
     type Register = super::mappings::regs::TCCR1C;
 
@@ -1047,6 +1164,7 @@ impl MaskMapping for FOC1A {
 }
 
 pub struct FOC1B;
+impl Sealed for FOC1B {}
 impl MaskMapping for FOC1B {
     type Register = super::mappings::regs::TCCR1C;
 
@@ -1056,6 +1174,7 @@ impl MaskMapping for FOC1B {
 }
 
 pub struct COM2B;
+impl Sealed for COM2B {}
 impl MaskMapping for COM2B {
     type Register = super::mappings::regs::TCCR2A;
 
@@ -1065,6 +1184,7 @@ impl MaskMapping for COM2B {
 }
 
 pub struct WGM2;
+impl Sealed for WGM2 {}
 impl MaskMapping for WGM2 {
     type Register = super::mappings::regs::TCCR2A;
 
@@ -1074,6 +1194,7 @@ impl MaskMapping for WGM2 {
 }
 
 pub struct COM2A;
+impl Sealed for COM2A {}
 impl MaskMapping for COM2A {
     type Register = super::mappings::regs::TCCR2A;
 
@@ -1083,6 +1204,7 @@ impl MaskMapping for COM2A {
 }
 
 pub struct FOC2B;
+impl Sealed for FOC2B {}
 impl MaskMapping for FOC2B {
     type Register = super::mappings::regs::TCCR2B;
 
@@ -1092,6 +1214,7 @@ impl MaskMapping for FOC2B {
 }
 
 pub struct WGM22;
+impl Sealed for WGM22 {}
 impl MaskMapping for WGM22 {
     type Register = super::mappings::regs::TCCR2B;
 
@@ -1101,6 +1224,7 @@ impl MaskMapping for WGM22 {
 }
 
 pub struct CS2;
+impl Sealed for CS2 {}
 impl MaskMapping for CS2 {
     type Register = super::mappings::regs::TCCR2B;
 
@@ -1110,6 +1234,7 @@ impl MaskMapping for CS2 {
 }
 
 pub struct FOC2A;
+impl Sealed for FOC2A {}
 impl MaskMapping for FOC2A {
     type Register = super::mappings::regs::TCCR2B;
 
@@ -1119,6 +1244,7 @@ impl MaskMapping for FOC2A {
 }
 
 pub struct OCF0A;
+impl Sealed for OCF0A {}
 impl MaskMapping for OCF0A {
     type Register = super::mappings::regs::TIFR0;
 
@@ -1128,6 +1254,7 @@ impl MaskMapping for OCF0A {
 }
 
 pub struct OCF0B;
+impl Sealed for OCF0B {}
 impl MaskMapping for OCF0B {
     type Register = super::mappings::regs::TIFR0;
 
@@ -1137,6 +1264,7 @@ impl MaskMapping for OCF0B {
 }
 
 pub struct TOV0;
+impl Sealed for TOV0 {}
 impl MaskMapping for TOV0 {
     type Register = super::mappings::regs::TIFR0;
 
@@ -1146,6 +1274,7 @@ impl MaskMapping for TOV0 {
 }
 
 pub struct OCF1A;
+impl Sealed for OCF1A {}
 impl MaskMapping for OCF1A {
     type Register = super::mappings::regs::TIFR1;
 
@@ -1155,6 +1284,7 @@ impl MaskMapping for OCF1A {
 }
 
 pub struct TOV1;
+impl Sealed for TOV1 {}
 impl MaskMapping for TOV1 {
     type Register = super::mappings::regs::TIFR1;
 
@@ -1164,6 +1294,7 @@ impl MaskMapping for TOV1 {
 }
 
 pub struct ICF1;
+impl Sealed for ICF1 {}
 impl MaskMapping for ICF1 {
     type Register = super::mappings::regs::TIFR1;
 
@@ -1173,6 +1304,7 @@ impl MaskMapping for ICF1 {
 }
 
 pub struct OCF1B;
+impl Sealed for OCF1B {}
 impl MaskMapping for OCF1B {
     type Register = super::mappings::regs::TIFR1;
 
@@ -1182,6 +1314,7 @@ impl MaskMapping for OCF1B {
 }
 
 pub struct OCF2B;
+impl Sealed for OCF2B {}
 impl MaskMapping for OCF2B {
     type Register = super::mappings::regs::TIFR2;
 
@@ -1191,6 +1324,7 @@ impl MaskMapping for OCF2B {
 }
 
 pub struct TOV2;
+impl Sealed for TOV2 {}
 impl MaskMapping for TOV2 {
     type Register = super::mappings::regs::TIFR2;
 
@@ -1200,6 +1334,7 @@ impl MaskMapping for TOV2 {
 }
 
 pub struct OCF2A;
+impl Sealed for OCF2A {}
 impl MaskMapping for OCF2A {
     type Register = super::mappings::regs::TIFR2;
 
@@ -1209,6 +1344,7 @@ impl MaskMapping for OCF2A {
 }
 
 pub struct OCIE0A;
+impl Sealed for OCIE0A {}
 impl MaskMapping for OCIE0A {
     type Register = super::mappings::regs::TIMSK0;
 
@@ -1218,6 +1354,7 @@ impl MaskMapping for OCIE0A {
 }
 
 pub struct TOIE0;
+impl Sealed for TOIE0 {}
 impl MaskMapping for TOIE0 {
     type Register = super::mappings::regs::TIMSK0;
 
@@ -1227,6 +1364,7 @@ impl MaskMapping for TOIE0 {
 }
 
 pub struct OCIE0B;
+impl Sealed for OCIE0B {}
 impl MaskMapping for OCIE0B {
     type Register = super::mappings::regs::TIMSK0;
 
@@ -1236,6 +1374,7 @@ impl MaskMapping for OCIE0B {
 }
 
 pub struct OCIE1B;
+impl Sealed for OCIE1B {}
 impl MaskMapping for OCIE1B {
     type Register = super::mappings::regs::TIMSK1;
 
@@ -1245,6 +1384,7 @@ impl MaskMapping for OCIE1B {
 }
 
 pub struct TOIE1;
+impl Sealed for TOIE1 {}
 impl MaskMapping for TOIE1 {
     type Register = super::mappings::regs::TIMSK1;
 
@@ -1254,6 +1394,7 @@ impl MaskMapping for TOIE1 {
 }
 
 pub struct ICIE1;
+impl Sealed for ICIE1 {}
 impl MaskMapping for ICIE1 {
     type Register = super::mappings::regs::TIMSK1;
 
@@ -1263,6 +1404,7 @@ impl MaskMapping for ICIE1 {
 }
 
 pub struct OCIE1A;
+impl Sealed for OCIE1A {}
 impl MaskMapping for OCIE1A {
     type Register = super::mappings::regs::TIMSK1;
 
@@ -1272,6 +1414,7 @@ impl MaskMapping for OCIE1A {
 }
 
 pub struct TOIE2;
+impl Sealed for TOIE2 {}
 impl MaskMapping for TOIE2 {
     type Register = super::mappings::regs::TIMSK2;
 
@@ -1281,6 +1424,7 @@ impl MaskMapping for TOIE2 {
 }
 
 pub struct OCIE2A;
+impl Sealed for OCIE2A {}
 impl MaskMapping for OCIE2A {
     type Register = super::mappings::regs::TIMSK2;
 
@@ -1290,6 +1434,7 @@ impl MaskMapping for OCIE2A {
 }
 
 pub struct OCIE2B;
+impl Sealed for OCIE2B {}
 impl MaskMapping for OCIE2B {
     type Register = super::mappings::regs::TIMSK2;
 
@@ -1299,6 +1444,7 @@ impl MaskMapping for OCIE2B {
 }
 
 pub struct TWAM;
+impl Sealed for TWAM {}
 impl MaskMapping for TWAM {
     type Register = super::mappings::regs::TWAMR;
 
@@ -1308,6 +1454,7 @@ impl MaskMapping for TWAM {
 }
 
 pub struct TWA;
+impl Sealed for TWA {}
 impl MaskMapping for TWA {
     type Register = super::mappings::regs::TWAR;
 
@@ -1317,6 +1464,7 @@ impl MaskMapping for TWA {
 }
 
 pub struct TWGCE;
+impl Sealed for TWGCE {}
 impl MaskMapping for TWGCE {
     type Register = super::mappings::regs::TWAR;
 
@@ -1326,6 +1474,7 @@ impl MaskMapping for TWGCE {
 }
 
 pub struct TWINT;
+impl Sealed for TWINT {}
 impl MaskMapping for TWINT {
     type Register = super::mappings::regs::TWCR;
 
@@ -1335,6 +1484,7 @@ impl MaskMapping for TWINT {
 }
 
 pub struct TWWC;
+impl Sealed for TWWC {}
 impl MaskMapping for TWWC {
     type Register = super::mappings::regs::TWCR;
 
@@ -1344,6 +1494,7 @@ impl MaskMapping for TWWC {
 }
 
 pub struct TWEN;
+impl Sealed for TWEN {}
 impl MaskMapping for TWEN {
     type Register = super::mappings::regs::TWCR;
 
@@ -1353,6 +1504,7 @@ impl MaskMapping for TWEN {
 }
 
 pub struct TWSTA;
+impl Sealed for TWSTA {}
 impl MaskMapping for TWSTA {
     type Register = super::mappings::regs::TWCR;
 
@@ -1362,6 +1514,7 @@ impl MaskMapping for TWSTA {
 }
 
 pub struct TWSTO;
+impl Sealed for TWSTO {}
 impl MaskMapping for TWSTO {
     type Register = super::mappings::regs::TWCR;
 
@@ -1371,6 +1524,7 @@ impl MaskMapping for TWSTO {
 }
 
 pub struct TWIE;
+impl Sealed for TWIE {}
 impl MaskMapping for TWIE {
     type Register = super::mappings::regs::TWCR;
 
@@ -1380,6 +1534,7 @@ impl MaskMapping for TWIE {
 }
 
 pub struct TWEA;
+impl Sealed for TWEA {}
 impl MaskMapping for TWEA {
     type Register = super::mappings::regs::TWCR;
 
@@ -1389,6 +1544,7 @@ impl MaskMapping for TWEA {
 }
 
 pub struct TWS;
+impl Sealed for TWS {}
 impl MaskMapping for TWS {
     type Register = super::mappings::regs::TWSR;
 
@@ -1398,6 +1554,7 @@ impl MaskMapping for TWS {
 }
 
 pub struct TWPS;
+impl Sealed for TWPS {}
 impl MaskMapping for TWPS {
     type Register = super::mappings::regs::TWSR;
 
@@ -1407,6 +1564,7 @@ impl MaskMapping for TWPS {
 }
 
 pub struct DOR0;
+impl Sealed for DOR0 {}
 impl MaskMapping for DOR0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1416,6 +1574,7 @@ impl MaskMapping for DOR0 {
 }
 
 pub struct U2X0;
+impl Sealed for U2X0 {}
 impl MaskMapping for U2X0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1425,6 +1584,7 @@ impl MaskMapping for U2X0 {
 }
 
 pub struct RXC0;
+impl Sealed for RXC0 {}
 impl MaskMapping for RXC0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1434,6 +1594,7 @@ impl MaskMapping for RXC0 {
 }
 
 pub struct MPCM0;
+impl Sealed for MPCM0 {}
 impl MaskMapping for MPCM0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1443,6 +1604,7 @@ impl MaskMapping for MPCM0 {
 }
 
 pub struct TXC0;
+impl Sealed for TXC0 {}
 impl MaskMapping for TXC0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1452,6 +1614,7 @@ impl MaskMapping for TXC0 {
 }
 
 pub struct UDRE0;
+impl Sealed for UDRE0 {}
 impl MaskMapping for UDRE0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1461,6 +1624,7 @@ impl MaskMapping for UDRE0 {
 }
 
 pub struct FE0;
+impl Sealed for FE0 {}
 impl MaskMapping for FE0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1470,6 +1634,7 @@ impl MaskMapping for FE0 {
 }
 
 pub struct UPE0;
+impl Sealed for UPE0 {}
 impl MaskMapping for UPE0 {
     type Register = super::mappings::regs::UCSR0A;
 
@@ -1479,6 +1644,7 @@ impl MaskMapping for UPE0 {
 }
 
 pub struct TXB80;
+impl Sealed for TXB80 {}
 impl MaskMapping for TXB80 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1488,6 +1654,7 @@ impl MaskMapping for TXB80 {
 }
 
 pub struct TXEN0;
+impl Sealed for TXEN0 {}
 impl MaskMapping for TXEN0 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1497,6 +1664,7 @@ impl MaskMapping for TXEN0 {
 }
 
 pub struct RXB80;
+impl Sealed for RXB80 {}
 impl MaskMapping for RXB80 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1506,6 +1674,7 @@ impl MaskMapping for RXB80 {
 }
 
 pub struct RXEN0;
+impl Sealed for RXEN0 {}
 impl MaskMapping for RXEN0 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1515,6 +1684,7 @@ impl MaskMapping for RXEN0 {
 }
 
 pub struct TXCIE0;
+impl Sealed for TXCIE0 {}
 impl MaskMapping for TXCIE0 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1524,6 +1694,7 @@ impl MaskMapping for TXCIE0 {
 }
 
 pub struct RXCIE0;
+impl Sealed for RXCIE0 {}
 impl MaskMapping for RXCIE0 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1533,6 +1704,7 @@ impl MaskMapping for RXCIE0 {
 }
 
 pub struct UDRIE0;
+impl Sealed for UDRIE0 {}
 impl MaskMapping for UDRIE0 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1542,6 +1714,7 @@ impl MaskMapping for UDRIE0 {
 }
 
 pub struct UCSZ02;
+impl Sealed for UCSZ02 {}
 impl MaskMapping for UCSZ02 {
     type Register = super::mappings::regs::UCSR0B;
 
@@ -1551,6 +1724,7 @@ impl MaskMapping for UCSZ02 {
 }
 
 pub struct UCSZ0;
+impl Sealed for UCSZ0 {}
 impl MaskMapping for UCSZ0 {
     type Register = super::mappings::regs::UCSR0C;
 
@@ -1560,6 +1734,7 @@ impl MaskMapping for UCSZ0 {
 }
 
 pub struct USBS0;
+impl Sealed for USBS0 {}
 impl MaskMapping for USBS0 {
     type Register = super::mappings::regs::UCSR0C;
 
@@ -1569,6 +1744,7 @@ impl MaskMapping for USBS0 {
 }
 
 pub struct UCPOL0;
+impl Sealed for UCPOL0 {}
 impl MaskMapping for UCPOL0 {
     type Register = super::mappings::regs::UCSR0C;
 
@@ -1578,6 +1754,7 @@ impl MaskMapping for UCPOL0 {
 }
 
 pub struct UMSEL0;
+impl Sealed for UMSEL0 {}
 impl MaskMapping for UMSEL0 {
     type Register = super::mappings::regs::UCSR0C;
 
@@ -1587,6 +1764,7 @@ impl MaskMapping for UMSEL0 {
 }
 
 pub struct UPM0;
+impl Sealed for UPM0 {}
 impl MaskMapping for UPM0 {
     type Register = super::mappings::regs::UCSR0C;
 
@@ -1596,6 +1774,7 @@ impl MaskMapping for UPM0 {
 }
 
 pub struct WDCE;
+impl Sealed for WDCE {}
 impl MaskMapping for WDCE {
     type Register = super::mappings::regs::WDTCSR;
 
@@ -1605,6 +1784,7 @@ impl MaskMapping for WDCE {
 }
 
 pub struct WDIE;
+impl Sealed for WDIE {}
 impl MaskMapping for WDIE {
     type Register = super::mappings::regs::WDTCSR;
 
@@ -1614,6 +1794,7 @@ impl MaskMapping for WDIE {
 }
 
 pub struct WDE;
+impl Sealed for WDE {}
 impl MaskMapping for WDE {
     type Register = super::mappings::regs::WDTCSR;
 
@@ -1623,6 +1804,7 @@ impl MaskMapping for WDE {
 }
 
 pub struct WDIF;
+impl Sealed for WDIF {}
 impl MaskMapping for WDIF {
     type Register = super::mappings::regs::WDTCSR;
 
@@ -1632,6 +1814,7 @@ impl MaskMapping for WDIF {
 }
 
 pub struct WDP;
+impl Sealed for WDP {}
 impl MaskMapping for WDP {
     type Register = super::mappings::regs::WDTCSR;
 

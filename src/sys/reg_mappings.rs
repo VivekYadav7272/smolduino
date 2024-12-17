@@ -1,6 +1,7 @@
-use super::reg_io::RegisterMapping;
+use super::reg_io::{private::Sealed, RegisterMapping};
 use avrd::current as inner;
 pub struct LOW;
+impl Sealed for LOW {}
 impl RegisterMapping for LOW {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -9,6 +10,7 @@ impl RegisterMapping for LOW {
 }
 
 pub struct LOCKBIT;
+impl Sealed for LOCKBIT {}
 impl RegisterMapping for LOCKBIT {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -17,6 +19,7 @@ impl RegisterMapping for LOCKBIT {
 }
 
 pub struct HIGH;
+impl Sealed for HIGH {}
 impl RegisterMapping for HIGH {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -25,6 +28,7 @@ impl RegisterMapping for HIGH {
 }
 
 pub struct EXTENDED;
+impl Sealed for EXTENDED {}
 impl RegisterMapping for EXTENDED {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -33,6 +37,7 @@ impl RegisterMapping for EXTENDED {
 }
 
 pub struct PINB;
+impl Sealed for PINB {}
 impl RegisterMapping for PINB {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -41,6 +46,7 @@ impl RegisterMapping for PINB {
 }
 
 pub struct DDRB;
+impl Sealed for DDRB {}
 impl RegisterMapping for DDRB {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -49,6 +55,7 @@ impl RegisterMapping for DDRB {
 }
 
 pub struct PORTB;
+impl Sealed for PORTB {}
 impl RegisterMapping for PORTB {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -57,6 +64,7 @@ impl RegisterMapping for PORTB {
 }
 
 pub struct PINC;
+impl Sealed for PINC {}
 impl RegisterMapping for PINC {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -65,6 +73,7 @@ impl RegisterMapping for PINC {
 }
 
 pub struct DDRC;
+impl Sealed for DDRC {}
 impl RegisterMapping for DDRC {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -73,6 +82,7 @@ impl RegisterMapping for DDRC {
 }
 
 pub struct PORTC;
+impl Sealed for PORTC {}
 impl RegisterMapping for PORTC {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -81,6 +91,7 @@ impl RegisterMapping for PORTC {
 }
 
 pub struct PIND;
+impl Sealed for PIND {}
 impl RegisterMapping for PIND {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -89,6 +100,7 @@ impl RegisterMapping for PIND {
 }
 
 pub struct DDRD;
+impl Sealed for DDRD {}
 impl RegisterMapping for DDRD {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -97,6 +109,7 @@ impl RegisterMapping for DDRD {
 }
 
 pub struct PORTD;
+impl Sealed for PORTD {}
 impl RegisterMapping for PORTD {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -105,6 +118,7 @@ impl RegisterMapping for PORTD {
 }
 
 pub struct TIFR0;
+impl Sealed for TIFR0 {}
 impl RegisterMapping for TIFR0 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -113,6 +127,7 @@ impl RegisterMapping for TIFR0 {
 }
 
 pub struct TIFR1;
+impl Sealed for TIFR1 {}
 impl RegisterMapping for TIFR1 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -121,6 +136,7 @@ impl RegisterMapping for TIFR1 {
 }
 
 pub struct TIFR2;
+impl Sealed for TIFR2 {}
 impl RegisterMapping for TIFR2 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -129,6 +145,7 @@ impl RegisterMapping for TIFR2 {
 }
 
 pub struct PCIFR;
+impl Sealed for PCIFR {}
 impl RegisterMapping for PCIFR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -137,6 +154,7 @@ impl RegisterMapping for PCIFR {
 }
 
 pub struct EIFR;
+impl Sealed for EIFR {}
 impl RegisterMapping for EIFR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -145,6 +163,7 @@ impl RegisterMapping for EIFR {
 }
 
 pub struct EIMSK;
+impl Sealed for EIMSK {}
 impl RegisterMapping for EIMSK {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -153,6 +172,7 @@ impl RegisterMapping for EIMSK {
 }
 
 pub struct GPIOR0;
+impl Sealed for GPIOR0 {}
 impl RegisterMapping for GPIOR0 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -161,6 +181,7 @@ impl RegisterMapping for GPIOR0 {
 }
 
 pub struct EECR;
+impl Sealed for EECR {}
 impl RegisterMapping for EECR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -169,6 +190,7 @@ impl RegisterMapping for EECR {
 }
 
 pub struct EEDR;
+impl Sealed for EEDR {}
 impl RegisterMapping for EEDR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -177,6 +199,7 @@ impl RegisterMapping for EEDR {
 }
 
 pub struct EEAR;
+impl Sealed for EEAR {}
 impl RegisterMapping for EEAR {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -185,6 +208,7 @@ impl RegisterMapping for EEAR {
 }
 
 pub struct EEARL;
+impl Sealed for EEARL {}
 impl RegisterMapping for EEARL {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -193,6 +217,7 @@ impl RegisterMapping for EEARL {
 }
 
 pub struct EEARH;
+impl Sealed for EEARH {}
 impl RegisterMapping for EEARH {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -201,6 +226,7 @@ impl RegisterMapping for EEARH {
 }
 
 pub struct GTCCR;
+impl Sealed for GTCCR {}
 impl RegisterMapping for GTCCR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -209,6 +235,7 @@ impl RegisterMapping for GTCCR {
 }
 
 pub struct TCCR0A;
+impl Sealed for TCCR0A {}
 impl RegisterMapping for TCCR0A {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -217,6 +244,7 @@ impl RegisterMapping for TCCR0A {
 }
 
 pub struct TCCR0B;
+impl Sealed for TCCR0B {}
 impl RegisterMapping for TCCR0B {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -225,6 +253,7 @@ impl RegisterMapping for TCCR0B {
 }
 
 pub struct TCNT0;
+impl Sealed for TCNT0 {}
 impl RegisterMapping for TCNT0 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -233,6 +262,7 @@ impl RegisterMapping for TCNT0 {
 }
 
 pub struct OCR0A;
+impl Sealed for OCR0A {}
 impl RegisterMapping for OCR0A {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -241,6 +271,7 @@ impl RegisterMapping for OCR0A {
 }
 
 pub struct OCR0B;
+impl Sealed for OCR0B {}
 impl RegisterMapping for OCR0B {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -249,6 +280,7 @@ impl RegisterMapping for OCR0B {
 }
 
 pub struct GPIOR1;
+impl Sealed for GPIOR1 {}
 impl RegisterMapping for GPIOR1 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -257,6 +289,7 @@ impl RegisterMapping for GPIOR1 {
 }
 
 pub struct GPIOR2;
+impl Sealed for GPIOR2 {}
 impl RegisterMapping for GPIOR2 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -265,6 +298,7 @@ impl RegisterMapping for GPIOR2 {
 }
 
 pub struct SPCR;
+impl Sealed for SPCR {}
 impl RegisterMapping for SPCR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -273,6 +307,7 @@ impl RegisterMapping for SPCR {
 }
 
 pub struct SPSR;
+impl Sealed for SPSR {}
 impl RegisterMapping for SPSR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -281,6 +316,7 @@ impl RegisterMapping for SPSR {
 }
 
 pub struct SPDR;
+impl Sealed for SPDR {}
 impl RegisterMapping for SPDR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -289,6 +325,7 @@ impl RegisterMapping for SPDR {
 }
 
 pub struct ACSR;
+impl Sealed for ACSR {}
 impl RegisterMapping for ACSR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -297,6 +334,7 @@ impl RegisterMapping for ACSR {
 }
 
 pub struct SMCR;
+impl Sealed for SMCR {}
 impl RegisterMapping for SMCR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -305,6 +343,7 @@ impl RegisterMapping for SMCR {
 }
 
 pub struct MCUSR;
+impl Sealed for MCUSR {}
 impl RegisterMapping for MCUSR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -313,6 +352,7 @@ impl RegisterMapping for MCUSR {
 }
 
 pub struct MCUCR;
+impl Sealed for MCUCR {}
 impl RegisterMapping for MCUCR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -321,6 +361,7 @@ impl RegisterMapping for MCUCR {
 }
 
 pub struct SPMCSR;
+impl Sealed for SPMCSR {}
 impl RegisterMapping for SPMCSR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -329,6 +370,7 @@ impl RegisterMapping for SPMCSR {
 }
 
 pub struct SPL;
+impl Sealed for SPL {}
 impl RegisterMapping for SPL {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -337,6 +379,7 @@ impl RegisterMapping for SPL {
 }
 
 pub struct SP;
+impl Sealed for SP {}
 impl RegisterMapping for SP {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -345,6 +388,7 @@ impl RegisterMapping for SP {
 }
 
 pub struct SPH;
+impl Sealed for SPH {}
 impl RegisterMapping for SPH {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -353,6 +397,7 @@ impl RegisterMapping for SPH {
 }
 
 pub struct SREG;
+impl Sealed for SREG {}
 impl RegisterMapping for SREG {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -361,6 +406,7 @@ impl RegisterMapping for SREG {
 }
 
 pub struct WDTCSR;
+impl Sealed for WDTCSR {}
 impl RegisterMapping for WDTCSR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -369,6 +415,7 @@ impl RegisterMapping for WDTCSR {
 }
 
 pub struct CLKPR;
+impl Sealed for CLKPR {}
 impl RegisterMapping for CLKPR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -377,6 +424,7 @@ impl RegisterMapping for CLKPR {
 }
 
 pub struct PRR;
+impl Sealed for PRR {}
 impl RegisterMapping for PRR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -385,6 +433,7 @@ impl RegisterMapping for PRR {
 }
 
 pub struct OSCCAL;
+impl Sealed for OSCCAL {}
 impl RegisterMapping for OSCCAL {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -393,6 +442,7 @@ impl RegisterMapping for OSCCAL {
 }
 
 pub struct PCICR;
+impl Sealed for PCICR {}
 impl RegisterMapping for PCICR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -401,6 +451,7 @@ impl RegisterMapping for PCICR {
 }
 
 pub struct EICRA;
+impl Sealed for EICRA {}
 impl RegisterMapping for EICRA {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -409,6 +460,7 @@ impl RegisterMapping for EICRA {
 }
 
 pub struct PCMSK0;
+impl Sealed for PCMSK0 {}
 impl RegisterMapping for PCMSK0 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -417,6 +469,7 @@ impl RegisterMapping for PCMSK0 {
 }
 
 pub struct PCMSK1;
+impl Sealed for PCMSK1 {}
 impl RegisterMapping for PCMSK1 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -425,6 +478,7 @@ impl RegisterMapping for PCMSK1 {
 }
 
 pub struct PCMSK2;
+impl Sealed for PCMSK2 {}
 impl RegisterMapping for PCMSK2 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -433,6 +487,7 @@ impl RegisterMapping for PCMSK2 {
 }
 
 pub struct TIMSK0;
+impl Sealed for TIMSK0 {}
 impl RegisterMapping for TIMSK0 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -441,6 +496,7 @@ impl RegisterMapping for TIMSK0 {
 }
 
 pub struct TIMSK1;
+impl Sealed for TIMSK1 {}
 impl RegisterMapping for TIMSK1 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -449,6 +505,7 @@ impl RegisterMapping for TIMSK1 {
 }
 
 pub struct TIMSK2;
+impl Sealed for TIMSK2 {}
 impl RegisterMapping for TIMSK2 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -457,6 +514,7 @@ impl RegisterMapping for TIMSK2 {
 }
 
 pub struct ADCL;
+impl Sealed for ADCL {}
 impl RegisterMapping for ADCL {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -465,6 +523,7 @@ impl RegisterMapping for ADCL {
 }
 
 pub struct ADC;
+impl Sealed for ADC {}
 impl RegisterMapping for ADC {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -473,6 +532,7 @@ impl RegisterMapping for ADC {
 }
 
 pub struct ADCH;
+impl Sealed for ADCH {}
 impl RegisterMapping for ADCH {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -481,6 +541,7 @@ impl RegisterMapping for ADCH {
 }
 
 pub struct ADCSRA;
+impl Sealed for ADCSRA {}
 impl RegisterMapping for ADCSRA {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -489,6 +550,7 @@ impl RegisterMapping for ADCSRA {
 }
 
 pub struct ADCSRB;
+impl Sealed for ADCSRB {}
 impl RegisterMapping for ADCSRB {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -497,6 +559,7 @@ impl RegisterMapping for ADCSRB {
 }
 
 pub struct ADMUX;
+impl Sealed for ADMUX {}
 impl RegisterMapping for ADMUX {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -505,6 +568,7 @@ impl RegisterMapping for ADMUX {
 }
 
 pub struct DIDR0;
+impl Sealed for DIDR0 {}
 impl RegisterMapping for DIDR0 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -513,6 +577,7 @@ impl RegisterMapping for DIDR0 {
 }
 
 pub struct DIDR1;
+impl Sealed for DIDR1 {}
 impl RegisterMapping for DIDR1 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -521,6 +586,7 @@ impl RegisterMapping for DIDR1 {
 }
 
 pub struct TCCR1A;
+impl Sealed for TCCR1A {}
 impl RegisterMapping for TCCR1A {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -529,6 +595,7 @@ impl RegisterMapping for TCCR1A {
 }
 
 pub struct TCCR1B;
+impl Sealed for TCCR1B {}
 impl RegisterMapping for TCCR1B {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -537,6 +604,7 @@ impl RegisterMapping for TCCR1B {
 }
 
 pub struct TCCR1C;
+impl Sealed for TCCR1C {}
 impl RegisterMapping for TCCR1C {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -545,6 +613,7 @@ impl RegisterMapping for TCCR1C {
 }
 
 pub struct TCNT1L;
+impl Sealed for TCNT1L {}
 impl RegisterMapping for TCNT1L {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -553,6 +622,7 @@ impl RegisterMapping for TCNT1L {
 }
 
 pub struct TCNT1;
+impl Sealed for TCNT1 {}
 impl RegisterMapping for TCNT1 {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -561,6 +631,7 @@ impl RegisterMapping for TCNT1 {
 }
 
 pub struct TCNT1H;
+impl Sealed for TCNT1H {}
 impl RegisterMapping for TCNT1H {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -569,6 +640,7 @@ impl RegisterMapping for TCNT1H {
 }
 
 pub struct ICR1L;
+impl Sealed for ICR1L {}
 impl RegisterMapping for ICR1L {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -577,6 +649,7 @@ impl RegisterMapping for ICR1L {
 }
 
 pub struct ICR1;
+impl Sealed for ICR1 {}
 impl RegisterMapping for ICR1 {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -585,6 +658,7 @@ impl RegisterMapping for ICR1 {
 }
 
 pub struct ICR1H;
+impl Sealed for ICR1H {}
 impl RegisterMapping for ICR1H {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -593,6 +667,7 @@ impl RegisterMapping for ICR1H {
 }
 
 pub struct OCR1AL;
+impl Sealed for OCR1AL {}
 impl RegisterMapping for OCR1AL {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -601,6 +676,7 @@ impl RegisterMapping for OCR1AL {
 }
 
 pub struct OCR1A;
+impl Sealed for OCR1A {}
 impl RegisterMapping for OCR1A {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -609,6 +685,7 @@ impl RegisterMapping for OCR1A {
 }
 
 pub struct OCR1AH;
+impl Sealed for OCR1AH {}
 impl RegisterMapping for OCR1AH {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -617,6 +694,7 @@ impl RegisterMapping for OCR1AH {
 }
 
 pub struct OCR1BL;
+impl Sealed for OCR1BL {}
 impl RegisterMapping for OCR1BL {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -625,6 +703,7 @@ impl RegisterMapping for OCR1BL {
 }
 
 pub struct OCR1B;
+impl Sealed for OCR1B {}
 impl RegisterMapping for OCR1B {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -633,6 +712,7 @@ impl RegisterMapping for OCR1B {
 }
 
 pub struct OCR1BH;
+impl Sealed for OCR1BH {}
 impl RegisterMapping for OCR1BH {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -641,6 +721,7 @@ impl RegisterMapping for OCR1BH {
 }
 
 pub struct TCCR2A;
+impl Sealed for TCCR2A {}
 impl RegisterMapping for TCCR2A {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -649,6 +730,7 @@ impl RegisterMapping for TCCR2A {
 }
 
 pub struct TCCR2B;
+impl Sealed for TCCR2B {}
 impl RegisterMapping for TCCR2B {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -657,6 +739,7 @@ impl RegisterMapping for TCCR2B {
 }
 
 pub struct TCNT2;
+impl Sealed for TCNT2 {}
 impl RegisterMapping for TCNT2 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -665,6 +748,7 @@ impl RegisterMapping for TCNT2 {
 }
 
 pub struct OCR2A;
+impl Sealed for OCR2A {}
 impl RegisterMapping for OCR2A {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -673,6 +757,7 @@ impl RegisterMapping for OCR2A {
 }
 
 pub struct OCR2B;
+impl Sealed for OCR2B {}
 impl RegisterMapping for OCR2B {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -681,6 +766,7 @@ impl RegisterMapping for OCR2B {
 }
 
 pub struct ASSR;
+impl Sealed for ASSR {}
 impl RegisterMapping for ASSR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -689,6 +775,7 @@ impl RegisterMapping for ASSR {
 }
 
 pub struct TWBR;
+impl Sealed for TWBR {}
 impl RegisterMapping for TWBR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -697,6 +784,7 @@ impl RegisterMapping for TWBR {
 }
 
 pub struct TWSR;
+impl Sealed for TWSR {}
 impl RegisterMapping for TWSR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -705,6 +793,7 @@ impl RegisterMapping for TWSR {
 }
 
 pub struct TWAR;
+impl Sealed for TWAR {}
 impl RegisterMapping for TWAR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -713,6 +802,7 @@ impl RegisterMapping for TWAR {
 }
 
 pub struct TWDR;
+impl Sealed for TWDR {}
 impl RegisterMapping for TWDR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -721,6 +811,7 @@ impl RegisterMapping for TWDR {
 }
 
 pub struct TWCR;
+impl Sealed for TWCR {}
 impl RegisterMapping for TWCR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -729,6 +820,7 @@ impl RegisterMapping for TWCR {
 }
 
 pub struct TWAMR;
+impl Sealed for TWAMR {}
 impl RegisterMapping for TWAMR {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -737,6 +829,7 @@ impl RegisterMapping for TWAMR {
 }
 
 pub struct UCSR0A;
+impl Sealed for UCSR0A {}
 impl RegisterMapping for UCSR0A {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -745,6 +838,7 @@ impl RegisterMapping for UCSR0A {
 }
 
 pub struct UCSR0B;
+impl Sealed for UCSR0B {}
 impl RegisterMapping for UCSR0B {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -753,6 +847,7 @@ impl RegisterMapping for UCSR0B {
 }
 
 pub struct UCSR0C;
+impl Sealed for UCSR0C {}
 impl RegisterMapping for UCSR0C {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -761,6 +856,7 @@ impl RegisterMapping for UCSR0C {
 }
 
 pub struct UBRR0;
+impl Sealed for UBRR0 {}
 impl RegisterMapping for UBRR0 {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
@@ -769,6 +865,7 @@ impl RegisterMapping for UBRR0 {
 }
 
 pub struct UBRR0L;
+impl Sealed for UBRR0L {}
 impl RegisterMapping for UBRR0L {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -777,6 +874,7 @@ impl RegisterMapping for UBRR0L {
 }
 
 pub struct UBRR0H;
+impl Sealed for UBRR0H {}
 impl RegisterMapping for UBRR0H {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {
@@ -785,6 +883,7 @@ impl RegisterMapping for UBRR0H {
 }
 
 pub struct UDR0;
+impl Sealed for UDR0 {}
 impl RegisterMapping for UDR0 {
     type RegisterType = u8;
     fn get_reg_addr() -> *mut u8 {

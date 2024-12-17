@@ -9,8 +9,8 @@ pub mod mappings {
         pub use crate::sys::mask_mappings::*;
     }
 }
+pub mod interrupt;
 pub mod reg_io;
-
 // This is the default clock freq for Arduino Uno. Someone _CAN_ change it if they want to,
 // by messing with the fuse bits. Not handling that right now, maybe later.
 pub const F_CPU: u32 = 16_000_000;
