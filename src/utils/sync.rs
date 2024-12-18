@@ -11,20 +11,12 @@ pub struct SyncCell<T: ?Sized>(UnsafeCell<T>);
 unsafe impl<T: ?Sized> Sync for SyncCell<T> {}
 impl<T: Copy> SyncCell<T> {
     pub fn get(&self) -> T {
-        let was_enabled = interrupt::is_intr_enabled();
-        // We don't want to get interrupted in the middle of copying the value
-        interrupt::disable_intr();
-
-        // SAFETY: We're not going to be interrupted, so it's safe to read the value.
-        // + T: Copy means that we don't need to move the value out of the cell.
-        let val = unsafe { ptr::read(self.0.get()) };
-
-        if was_enabled {
-            // SAFETY: We're not in another interrupt, and critical section is over, so it's safe to
-            // enable it again now.
-            unsafe { interrupt::enable_intr() };
-        }
-        val
+        interrupt::scoped_critical_section(|| {
+            // SAFETY: We're not going to be interrupted, so it's safe to read the value.
+            // + T: Copy means that we don't need to move the value out of the cell.
+            let val = unsafe { ptr::read(self.0.get()) };
+            val
+        })
     }
 }
 
@@ -73,22 +65,14 @@ impl<T> SyncCell<T> {
     }
 
     pub fn swap(&self, other: T) -> T {
-        let was_enabled = interrupt::is_intr_enabled();
-        // We don't want to get interrupted in the middle of copying the value
-        interrupt::disable_intr();
-
-        // SAFETY: Safe to do so since not going to be interrupted
-        // + inner value is valid for both read and write
-        // + inner value must've been properly aligned by default
-        // + no way to create inner value without it being a proper T (hence initialised)
-        let old_val = unsafe { ptr::replace(self.0.get(), other) };
-
-        if was_enabled {
-            // SAFETY: We're not in another interrupt, and critical section is over, so it's safe to
-            // enable it again now.
-            unsafe { interrupt::enable_intr() };
-        }
-        old_val
+        interrupt::scoped_critical_section(|| {
+            // SAFETY: Safe to do so since not going to be interrupted
+            // + inner value is valid for both read and write
+            // + inner value must've been properly aligned by default
+            // + no way to create inner value without it being a proper T (hence initialised)
+            let old_val = unsafe { ptr::replace(self.0.get(), other) };
+            old_val
+        })
     }
 
     pub fn set(&self, value: T) {
