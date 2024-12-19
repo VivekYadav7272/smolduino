@@ -6,10 +6,15 @@ edition = "2021"
 [lib]
 name = "smolduino"
 path = "src/lib.rs"
+# I'm just doing this to remove the unnecessary error by Rust-analyzer
+# I do not need tests rn, but might have to find an alterative soon when I do..
+test = false
+bench = false
 
-[[bin]]
-name = "rustymetal"
-path = "src/main.rs"
+
+[[example]]
+name = "serial-hello-world"
+path = "examples/serial_hello_world.rs"
 
 [profile.dev]
 panic = "abort"
