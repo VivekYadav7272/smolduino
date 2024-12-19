@@ -32,9 +32,9 @@ impl CriticalSectionGuard {
 
 impl Drop for CriticalSectionGuard {
     fn drop(&mut self) {
-        // It is possible that this ScopedCriticalSection was inside another ScopedCriticalSection.
+        // It is possible that this critical-section was inside another critical-section.
         // In that case, we don't want to re-enable interrupts, as it would allow for nested interrupts
-        // and make the parent critical section not critical anymore,
+        // and make the parent critical-section not critical anymore,
         // and that violates the safety requirements (set up by ourselves, not an actual AVR requirement).
         if self.was_intr_enabled {
             // SAFETY: Since the interrupt was enabled before, this means that we're not inside another
@@ -76,14 +76,15 @@ pub fn disable_intr() {
 pub fn is_intr_enabled() -> bool {
     Mask::with_mask_val(masks::I, 0).read_reg_masked() != 0
 }
+
 // Nice, atmega328 already clears the 'I' bit when serving an interrupt,
-// so we don't need to worry if another interrupt might interrupt our interrupt.
-pub struct Interrupt<T: Fn() -> ()> {
+// so we don't need to worry about nested interrupts.
+pub struct Interrupt<T: Fn()> {
     trigger: TriggerType,
     callback: T,
 }
 
-impl<T: Fn() -> ()> Interrupt<T> {
+impl<T: Fn()> Interrupt<T> {
     pub fn new(trigger: TriggerType, callback: T) -> Self {
         Self { trigger, callback }
     }
@@ -102,33 +103,35 @@ impl TriggerType {
 }
 
 mod interrupt_vectors {
-    // TODO: Add function pointer statics (Cell<fn() -> ()>) corresponding to each
-    // interrupt vector. They will simply call into the user-defined interrupt handler.
-    extern "avr-interrupt" fn __vector__default() {}
-    extern "avr-interrupt" fn __vector__1() {}
-    extern "avr-interrupt" fn __vector__2() {}
-    extern "avr-interrupt" fn __vector__3() {}
-    extern "avr-interrupt" fn __vector__4() {}
-    extern "avr-interrupt" fn __vector__5() {}
-    extern "avr-interrupt" fn __vector__6() {}
-    extern "avr-interrupt" fn __vector__7() {}
-    extern "avr-interrupt" fn __vector__8() {}
-    extern "avr-interrupt" fn __vector__9() {}
-    extern "avr-interrupt" fn __vector__10() {}
-    extern "avr-interrupt" fn __vector__11() {}
-    extern "avr-interrupt" fn __vector__12() {}
-    extern "avr-interrupt" fn __vector__13() {}
-    extern "avr-interrupt" fn __vector__14() {}
-    extern "avr-interrupt" fn __vector__15() {}
-    extern "avr-interrupt" fn __vector__16() {}
-    extern "avr-interrupt" fn __vector__17() {}
-    extern "avr-interrupt" fn __vector__18() {}
-    extern "avr-interrupt" fn __vector__19() {}
-    extern "avr-interrupt" fn __vector__20() {}
-    extern "avr-interrupt" fn __vector__21() {}
-    extern "avr-interrupt" fn __vector__22() {}
-    extern "avr-interrupt" fn __vector__23() {}
-    extern "avr-interrupt" fn __vector__24() {}
-    extern "avr-interrupt" fn __vector__25() {}
-    extern "avr-interrupt" fn __vector__26() {}
+    use crate::utils::nop::nops_n;
+
+    macro_rules! interrupt_vector {
+        ($num:literal $(, $rest:tt)*) => {
+            paste::paste! {
+                #[no_mangle]
+                extern "avr-interrupt" fn [<__vector_ $num>]() {
+                    nops_n($num);
+                }
+            }
+
+            interrupt_vector!($($rest),*);
+        };
+
+        ($name:ident $(, $rest:tt)*) => {
+            paste::paste! {
+                #[no_mangle]
+                extern "avr-interrupt" fn [<__vector_ $name>]() {
+                    nops_n(69);
+                }
+            }
+            interrupt_vector!($($rest),*);
+        };
+
+        () => {};
+    }
+
+    interrupt_vector!(
+        default, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+        24, 25, 26
+    );
 }
