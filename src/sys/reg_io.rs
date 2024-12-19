@@ -69,7 +69,7 @@ impl<Reg: RegisterMapping> Register<Reg> {
         // SAFETY: Should be fine because the mask should only be exactly as large as RegisterType.
         let mask: Reg::RegisterType = unsafe { mask.try_into().unwrap_unchecked() };
         // SAFETY: User must ensure that the bits being written to are correct or not.
-        unsafe { write_reg_unchecked(self.reg, val, mask.into()) };
+        unsafe { write_reg_unchecked(self.reg, val, mask) };
     }
 
     pub unsafe fn write_reg_masked(&mut self, mask: &Mask<Reg>) {

@@ -1,5 +1,6 @@
 #![no_std]
 #![feature(asm_experimental_arch)]
+#![feature(abi_avr_interrupt)]
 
 pub mod error;
 pub mod io;

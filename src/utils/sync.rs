@@ -53,7 +53,6 @@ impl<T: Ord + Copy> Ord for SyncCell<T> {
     }
 }
 impl<T> From<T> for SyncCell<T> {
-    /// Creates a new `Cell<T>` containing the given value.
     fn from(t: T) -> SyncCell<T> {
         SyncCell::new(t)
     }
@@ -66,10 +65,12 @@ impl<T> SyncCell<T> {
 
     pub fn swap(&self, other: T) -> T {
         interrupt::scoped_critical_section(|| {
-            // SAFETY: Safe to do so since not going to be interrupted
-            // + inner value is valid for both read and write
-            // + inner value must've been properly aligned by default
-            // + no way to create inner value without it being a proper T (hence initialised)
+            // SAFETY:
+            // + Safe to do so since not going to be interrupted
+            // + no way to create inner value without it being a proper T beforehand, hence:
+            //    inner value is valid for both read and write
+            //    inner value must've been properly aligned by default
+            //    inner is initialised
             let old_val = unsafe { ptr::replace(self.0.get(), other) };
             old_val
         })

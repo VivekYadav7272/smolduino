@@ -17,7 +17,8 @@ impl CriticalSectionGuard {
     pub fn new() -> Self {
         let was_intr_enabled = is_intr_enabled();
         // Case 1: Interrupt was enabled.
-        //    Corner case: Soon as we check this, another interrupt comes in (disables interrupt globally),
+        //    Corner case: Soon as we check this, another interrupt comes in and
+        //                 preempts us, and disables interrupt globally,
         //                 but then, it must've upon exiting, enabled it back.
         //                 So, the value read here is not stale still.
         // Case 2: Interrupt was disabled.
@@ -55,7 +56,7 @@ pub fn scoped_critical_section<T>(f: impl FnOnce() -> T) -> T {
 
 /// SAFETY Requirements:
 /// 1) You must ensure that you're not re-enabling interrupts in the middle of another interrupt
-/// as the synchronization primitives are not built to handle nested interrupts.
+///    as the synchronization primitives are not built to handle nested interrupts.
 /// 2) You must ensure that you're not enabling interrupts in the middle of a critical section.
 pub unsafe fn enable_intr() {
     unsafe {
