@@ -203,7 +203,15 @@ impl Sealed for EEAR {}
 impl RegisterMapping for EEAR {
     type RegisterType = u16;
     fn get_reg_addr() -> *mut u16 {
-        inner::EEAR
+        // OMG I was so worried that the pointer to u16 would be 2-byte aligned,
+        // hence violating the Rust constraint for references to be aligned to
+        // align_of_val(&T). However, to my surprise,
+        // align_of::<*mut u16>() == 1. So, I'm good.
+        // (If not, then this assertion would fail at compile-time and I would know.)
+        // Ik, weird place to put this assertion in, but this is the only
+        // Register with a non-2-byte aligned address.
+        const _: () = assert!(align_of::<*mut u16>() == 1);
+        inner::EEAR // inner::EEAR: *mut u16 = 0x41
     }
 }
 
