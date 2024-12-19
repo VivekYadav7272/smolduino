@@ -1,4 +1,6 @@
 #![allow(non_camel_case_types)]
+#![allow(clippy::upper_case_acronyms)]
+
 use super::reg_io::private::Sealed;
 use super::reg_io::MaskMapping;
 use avrd::current as inner;

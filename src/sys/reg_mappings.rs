@@ -1,3 +1,5 @@
+#![allow(clippy::upper_case_acronyms)]
+
 use super::reg_io::{private::Sealed, RegisterMapping};
 use avrd::current as inner;
 pub struct LOW;
