@@ -14,6 +14,10 @@ bench = false
 [[bin]]
 name = "rustymetal"
 path = "src/main.rs"
+# I'm just doing this to remove the unnecessary error by Rust-analyzer
+# I do not need tests rn, but might have to find an alterative soon when I do..
+test = false
+bench = false
 
 [profile.dev]
 codegen-units = 1
