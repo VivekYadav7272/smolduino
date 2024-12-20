@@ -7,10 +7,15 @@ use crate::{
     },
     utils::sync::SyncCell,
 };
-
 use core2::io;
 
 static SINGLETON_TAKEN: SyncCell<bool> = SyncCell::new(false);
+
+// TODO: After primitives have been nicely implemented:
+// register an interrupt with a callback for RX. Would utilise interrupt primitives.
+// Have a buffer for storing it. Would utilise Cell/Mutex primitives.
+// When that happens, offer more configurability?? (no. of stop bits, parity, etc. maybe?? not sure)
+
 /**
  * Utilises the hardware UART capabilities of Atmega328p to do serial communication.
  */

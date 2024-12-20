@@ -80,4 +80,4 @@ impl<T> SyncCell<T> {
         self.swap(value);
     }
 }
-// TODO: Also implement RefCell.
+// TODO: Also implement "Sync" RefCell, which I now realise is just a Mutex.

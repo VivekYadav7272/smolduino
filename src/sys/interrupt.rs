@@ -79,12 +79,12 @@ pub fn is_intr_enabled() -> bool {
 
 // Nice, atmega328 already clears the 'I' bit when serving an interrupt,
 // so we don't need to worry about nested interrupts.
-pub struct Interrupt<T: Fn()> {
+pub struct Interrupt<T: Fn() + Sync> {
     trigger: TriggerType,
     callback: T,
 }
 
-impl<T: Fn()> Interrupt<T> {
+impl<T: Fn() + Sync> Interrupt<T> {
     pub fn new(trigger: TriggerType, callback: T) -> Self {
         Self { trigger, callback }
     }
@@ -110,7 +110,7 @@ mod interrupt_vectors {
             paste::paste! {
                 #[no_mangle]
                 extern "avr-interrupt" fn [<__vector_ $num>]() {
-                    nops_n($num);
+                    // nops_n($num);
                 }
             }
 
@@ -121,7 +121,7 @@ mod interrupt_vectors {
             paste::paste! {
                 #[no_mangle]
                 extern "avr-interrupt" fn [<__vector_ $name>]() {
-                    nops_n(69);
+                    // nops_n(69);
                 }
             }
             interrupt_vector!($($rest),*);
