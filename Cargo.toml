@@ -11,11 +11,6 @@ path = "src/lib.rs"
 test = false
 bench = false
 
-
-[[example]]
-name = "serial-hello-world"
-path = "examples/serial_hello_world.rs"
-
 [[bin]]
 name = "rustymetal"
 path = "src/main.rs"
