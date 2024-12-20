@@ -21,6 +21,7 @@ name = "rustymetal"
 path = "src/main.rs"
 
 [profile.dev]
+codegen-units = 1
 panic = "abort"
 opt-level = "z"
 lto = true
