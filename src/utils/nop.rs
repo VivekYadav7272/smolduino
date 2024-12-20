@@ -5,7 +5,7 @@ pub fn nop() {
     unsafe { asm!("nop") };
 }
 
-pub fn nops_n(n: u32) {
+pub fn nops_n(n: u8) {
     for _ in 0..n {
         nop();
     }
