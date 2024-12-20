@@ -16,6 +16,10 @@ bench = false
 name = "serial-hello-world"
 path = "examples/serial_hello_world.rs"
 
+[[bin]]
+name = "rustymetal"
+path = "src/main.rs"
+
 [profile.dev]
 panic = "abort"
 opt-level = "z"
