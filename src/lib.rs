@@ -4,6 +4,7 @@
 
 pub mod error;
 pub mod io;
+pub mod sync;
 pub mod sys;
 pub mod timing;
 pub mod utils;

@@ -1,11 +1,11 @@
 use crate::{
     error::Error,
+    sync::synccell::SyncCell,
     sys::{
         self,
         mappings::{masks, regs},
         reg_io::{Mask, Register},
     },
-    utils::sync::SyncCell,
 };
 use core2::io;
 

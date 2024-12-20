@@ -5,7 +5,8 @@
 
 pub mod error;
 pub mod io;
-pub(crate) mod sys;
+pub mod sync;
+pub mod sys;
 pub mod timing;
 pub mod utils;
 
