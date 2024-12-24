@@ -5,4 +5,5 @@ target = "atmega328p.json"
 build-std = ["core"]
 
 [target.'cfg(target_arch = "avr")']
+# rustflags = ["-C", "link-arg=-Wl,-Map=output_example.map"]
 runner = "ravedude uno --baudrate 9600 --open-console"
