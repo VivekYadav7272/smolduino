@@ -53,16 +53,16 @@ impl<Reg: RegisterMapping> Register<Reg> {
         }
     }
 
-    // Required for registers
-    // ['ADC', 'ADCH', 'ADCL', 'DDRB', 'DDRC', 'DDRD', 'EEAR', 'EEARH', 'EEARL', 'EEDR', 'GPIOR0',
-    // 'GPIOR1', 'GPIOR2', 'ICR1', 'ICR1H', 'ICR1L', 'OCR0A', 'OCR0B', 'OCR1A', 'OCR1AH', 'OCR1AL',
-    // 'OCR1B', 'OCR1BH', 'OCR1BL', 'OCR2A', 'OCR2B', 'OSCCAL', 'PCMSK0', 'PCMSK1', 'PCMSK2', 'PINB',
-    // 'PINC', 'PIND', 'PORTB', 'PORTC', 'PORTD', 'SP', 'SPDR', 'SPH', 'SPL', 'TCNT0', 'TCNT1',
-    // 'TCNT1H', 'TCNT1L', 'TCNT2', 'TWBR', 'TWDR', 'UBRR0', 'UBRR0H', 'UBRR0L', 'UDR0']
-    // which don't have available masks, so we don't really know what's "correct" to write there.
-    // Most of these require a higher-level abstraction to be correctly/constraintly used anyways,
-    // so it's good that having to use unsafe on them feels uneasy and reminds us to create
-    // a higher-level abstraction first.
+    /// Required for registers
+    /// ['ADC', 'ADCH', 'ADCL', 'DDRB', 'DDRC', 'DDRD', 'EEAR', 'EEARH', 'EEARL', 'EEDR', 'GPIOR0',
+    /// 'GPIOR1', 'GPIOR2', 'ICR1', 'ICR1H', 'ICR1L', 'OCR0A', 'OCR0B', 'OCR1A', 'OCR1AH', 'OCR1AL',
+    /// 'OCR1B', 'OCR1BH', 'OCR1BL', 'OCR2A', 'OCR2B', 'OSCCAL', 'PCMSK0', 'PCMSK1', 'PCMSK2', 'PINB',
+    /// 'PINC', 'PIND', 'PORTB', 'PORTC', 'PORTD', 'SP', 'SPDR', 'SPH', 'SPL', 'TCNT0', 'TCNT1',
+    /// 'TCNT1H', 'TCNT1L', 'TCNT2', 'TWBR', 'TWDR', 'UBRR0', 'UBRR0H', 'UBRR0L', 'UDR0']
+    /// which don't have available masks, so we don't really know what's "correct" to write there.
+    /// Most of these require a higher-level abstraction to be correctly/constraintly used anyways,
+    /// so it's good that having to use unsafe on them feels uneasy and reminds us to create
+    /// a higher-level abstraction first.
     pub unsafe fn write_reg(&mut self, val: Reg::RegisterType) {
         let mask = (1u32 << self.width()) - 1;
 
@@ -85,7 +85,6 @@ impl<Reg: RegisterMapping> Register<Reg> {
     pub fn read_reg_masked(&self, mask: &Mask<Reg>) -> u8 {
         // SAFETY:
         // 1) Using type-safety (only registers declared in sys::regs), we know the pointer we're dereferencing is non-null and aligned
-        // (naturally aligned because they're all u8)
         // 2) We can assert that conversion into u8 will never fail because mask is u8,
         // meaning whatever value we get after and'ing with a mask is a u8.
         unsafe {
@@ -93,6 +92,13 @@ impl<Reg: RegisterMapping> Register<Reg> {
                 .try_into()
                 .unwrap_unchecked()
         }
+    }
+
+    /// Does NOT return the mask itself, but the masked value.
+    /// Also different from self.read_reg_masked, in that it doesn't return the whole register.
+    /// Only the mask part.
+    pub fn read_mask(&self, mask: &Mask<Reg>) -> u8 {
+        self.read_reg_masked(mask) >> mask.get_shift()
     }
 
     pub fn ptr(&self) -> *mut Reg::RegisterType {
@@ -156,8 +162,6 @@ impl<Reg: RegisterMapping> Mask<Reg> {
     }
 
     pub fn read_reg_masked(&self) -> u8 {
-        // SAFETY: Through type-safety, we've ensured that the register is correct, the value is placed
-        // correctly, and that the mask is correct (obviously)
         Register::<Reg>::new().read_reg_masked(self)
     }
 
@@ -167,6 +171,10 @@ impl<Reg: RegisterMapping> Mask<Reg> {
 
     pub fn get_mask(&self) -> u8 {
         self.mask
+    }
+
+    pub fn read_mask(&self) -> u8 {
+        self.read_reg_masked() >> self.get_shift()
     }
 
     pub fn get_shift(&self) -> u8 {
