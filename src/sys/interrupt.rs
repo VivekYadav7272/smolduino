@@ -1,11 +1,12 @@
 use core::arch::asm;
 
-use super::{mappings::masks, reg_io::Mask};
+use crate::sync::synccell::SyncCell;
 
+use super::{mappings::masks, reg_io::Mask};
 /*
 TODO:
 - Implement Interrupts
-- Implement Cell/RefCell analogues for AVR (basically clearing interrupts for "atomic" operations)
+- Implement Cell/RefCell analogues for AVR (basically clearing interrupts for "atomic" operations).. DONE
 - Write a setTimeout/setInterval function that utilises this API.
 */
 
@@ -90,24 +91,38 @@ impl<T: Fn() + Sync> Interrupt<T> {
     }
 
     pub fn enable(&mut self) {
+        // first, set the callback.
+        let callsite = self.trigger.get_callsite();
+
+        callsite.set(&self.callback);
         // depending on different TriggerTypes, enable that specific Trigger's interrupt.
-        let intr_bit_mask = self.trigger.intr_bit_mask();
+        self.trigger.set_enable_bit();
     }
 }
 
 pub enum TriggerType {}
 impl TriggerType {
-    pub fn intr_bit_mask(&self) -> u8 {
-        todo!("match on the specific kinda interrupt and return the bit mask accordingly")
+    fn set_enable_bit(&mut self) {
+        todo!("match on the specific kinda interrupt and set its interrupt bit true")
+    }
+
+    fn get_callsite<'a, 'b: 'a>(&'a self) -> &'a SyncCell<&'b dyn Fn()> {
+        todo!("match on the specific kinda interrupt and return its specific interrupt_fn_$num")
     }
 }
 
 mod interrupt_vectors {
-    use crate::utils::nop::nops_n;
+    use crate::sync::synccell::SyncCell;
+    use crate::utils::nop::nop;
+
+    static interrupt_fn_1: SyncCell<&dyn Fn()> = SyncCell::new(&|| {
+        nop();
+    });
 
     macro_rules! interrupt_vector {
         ($num:literal $(, $rest:tt)*) => {
             paste::paste! {
+
                 #[no_mangle]
                 extern "avr-interrupt" fn [<__vector_ $num>]() {
                     // nops_n($num);
