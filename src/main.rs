@@ -13,6 +13,7 @@ pub mod utils;
 use core::{panic::PanicInfo, time::Duration};
 use core2::io::Write;
 use io::serial::Serial;
+use smolduino::sync::synccell::SyncCell;
 use sys::interrupt;
 use timing::delay;
 
@@ -29,8 +30,17 @@ extern "C" fn main() -> ! {
     // smolduino::init() -> Smolduino, which returns an object Smolduino on which all the other
     // functions and objects are attached. That way, there's no feasible way to use the library
     // without avoiding to call ::init() first, within which we can run our runtime init stuff.
-    // However, I don't know how scalable this technique is, or do we have to add all these at runtime.
+    // However, I don'  t know how scalable this technique is, or do we have to add all these at runtime.
 
+    let mut a = 0;
+    let fn_inc_a = || a += 1;
+    interrupt::scope(|scope| {
+        scope.attach(interrupt::TriggerType::Whatever, &fn_inc_a);
+        // Uncommenting the following lines should fail to compile:
+        // let mut b = 0;
+        // let fn_inc_b = || b += 1;
+        // scope.attach(interrupt::TriggerType::Whatever, &fn_inc_b);
+    });
     unsafe {
         interrupt::enable_intr();
     }
