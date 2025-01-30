@@ -1,5 +1,8 @@
-use super::{mappings::masks, reg_io::Mask};
 use core::arch::asm;
+
+use crate::sync::synccell::SyncCell;
+
+use super::{mappings::masks, reg_io::Mask};
 /*
 TODO:
 - Implement Interrupts
@@ -88,54 +91,41 @@ impl<T: Fn() + Sync> Interrupt<T> {
     }
 
     pub fn enable(&mut self) {
-        self.trigger.set_callsite(&self.callback);
-        // depending on different TriggerTypes, enable that specific Trigger's interrupt.
-        self.trigger.set_bit(true);
-    }
-}
+        // first, set the callback.
+        let callsite = self.trigger.get_callsite();
 
-impl<T: Fn() + Sync> Drop for Interrupt<T> {
-    fn drop(&mut self) {
-        // clear the interrupt storage by replacing with a empty closure.
-        // the actual closure will be dropped after this function returns.
-        self.trigger.set_callsite(&|| {});
-        self.trigger.set_bit(false);
+        callsite.set(&self.callback);
+        // depending on different TriggerTypes, enable that specific Trigger's interrupt.
+        self.trigger.set_enable_bit();
     }
 }
 
 pub enum TriggerType {}
 impl TriggerType {
-    fn set_bit(&mut self, enable: bool) {
+    fn set_enable_bit(&mut self) {
         todo!("match on the specific kinda interrupt and set its interrupt bit true")
     }
 
-    fn set_callsite(&mut self, fn_ref: &dyn Fn()) {
-        let fn_ptr = fn_ref as *const dyn Fn() as *const dyn Fn();
-        interrupt_vectors::interrupt_fn_default.set(fn_ptr);
-        // todo!("match on the specific kinda interrupt and return its specific interrupt_fn_$num")
+    fn get_callsite<'a, 'b: 'a>(&'a self) -> &'a SyncCell<&'b dyn Fn()> {
+        todo!("match on the specific kinda interrupt and return its specific interrupt_fn_$num")
     }
 }
 
 mod interrupt_vectors {
-    #[allow(non_upper_case_globals)]
     use crate::sync::synccell::SyncCell;
+    use crate::utils::nop::nop;
+
+    static interrupt_fn_1: SyncCell<&dyn Fn()> = SyncCell::new(&|| {
+        nop();
+    });
+
     macro_rules! interrupt_vector {
         ($num:literal $(, $rest:tt)*) => {
             paste::paste! {
-                pub static [<interrupt_fn_ $num>]: SyncCell<*const dyn Fn()> = SyncCell::new(&|| {});
 
                 #[no_mangle]
                 extern "avr-interrupt" fn [<__vector_ $num>]() {
-                    let fn_ptr = [<interrupt_fn_ $num>].get();
-                    // SAFETY:
-                    // The closure will not be modified because it implements Fn(), not FnMut(),
-                    // so taking a read-only reference is fine from POV of mutability.
-                    // From lifetime POV, we assume that the thing hasn't been destroyed yet.
-                    // This invariant is upholded by Interrupt struct, which ensures that when it
-                    // is dropped (and the closure with it), then it resets interrupt_fn_test to point to a empty closure.
-                    // Hence, we're never pointing to an invalid closure.
-                    let fn_ref = unsafe { &*fn_ptr };
-                    fn_ref();
+                    // nops_n($num);
                 }
             }
 
@@ -144,20 +134,9 @@ mod interrupt_vectors {
 
         ($name:ident $(, $rest:tt)*) => {
             paste::paste! {
-                pub static [<interrupt_fn_ $name>]: SyncCell<*const dyn Fn()> = SyncCell::new(&|| {});
-
                 #[no_mangle]
                 extern "avr-interrupt" fn [<__vector_ $name>]() {
-                    let fn_ptr = [<interrupt_fn_ $name>].get();
-                    // SAFETY:
-                    // The closure will not be modified because it implements Fn(), not FnMut(),
-                    // so taking a read-only reference is fine from POV of mutability.
-                    // From lifetime POV, we assume that the thing hasn't been destroyed yet.
-                    // This invariant is upholded by Interrupt struct, which ensures that when it
-                    // is dropped (and the closure with it), then it resets interrupt_fn_test to point to a empty closure.
-                    // Hence, we're never pointing to an invalid closure.
-                    let fn_ref = unsafe { &*fn_ptr };
-                    fn_ref();
+                    // nops_n(69);
                 }
             }
             interrupt_vector!($($rest),*);
