@@ -1,4 +1,8 @@
-use core::{arch::asm, marker::PhantomData};
+use core::{
+    any::{Any, TypeId},
+    arch::asm,
+    marker::PhantomData,
+};
 
 use crate::sync::synccell::SyncCell;
 
@@ -80,7 +84,7 @@ pub fn is_intr_enabled() -> bool {
 
 // Nice, atmega328 already clears the 'I' bit when serving an interrupt,
 // so we don't need to worry about nested interrupts.
-pub struct Interrupt<T: FnMut() + Sync + 'static> {
+pub struct Interrupt<T: Fn() + Sync + 'static> {
     trigger: TriggerType,
     callback: &'static T,
 }
@@ -89,7 +93,7 @@ pub struct Interrupt<T: FnMut() + Sync + 'static> {
 // we can't use it to guarantee unsafe invariants
 // (like promise to remove reference to a non-'static closure)
 // Hence, we're forced to stick with 'static closures only.
-impl<T: FnMut() + Sync + 'static> Interrupt<T> {
+impl<T: Fn() + Sync + 'static> Interrupt<T> {
     pub fn new(trigger: TriggerType, callback: &'static T) -> Self {
         Self { trigger, callback }
     }
@@ -110,12 +114,19 @@ impl<T: FnMut() + Sync + 'static> Interrupt<T> {
     }
 }
 
-impl<T: FnMut() + Sync + 'static> Drop for Interrupt<T> {
+impl<T: Fn() + Sync + 'static> Drop for Interrupt<T> {
     fn drop(&mut self) {
         self.disable();
     }
 }
 
+/// Create a scope for enabling interrupts and registering callbacks,
+/// which are disabled after the scope ends.
+/// If there's a nested scope inside a scope, and they try to register
+/// a callback on the same interrupt, the most nested interrupt is prioritised.
+/// Due to limitations around heap allocations on this system, we cannot maintain
+/// a list of applied callbacks, so after the most nested scope ends,
+/// the older callback is NOT restored back. The interrupt is simply disabled.
 pub fn scope<'scope, T>(scoped: T)
 where
     T: FnOnce(&Scope<'scope>),
@@ -148,21 +159,51 @@ impl<'scope> Scope<'scope> {
     //  Closure itself is just code, which is static inside the binary/.text segment.
     // However, as of now, Rust doesn't treat closures with that fine-grained discrimination
     where
-        F: FnMut() + Sync + 'scope,
+        F: Fn() + Sync + 'scope,
     {
         let callsite = trigger.get_callsite();
         // the second pointer cast seems redundant, but it does an implicit cast from &'a to &'static.
-        let fn_ptr = intr as &dyn FnMut() as *const dyn FnMut() as *const dyn FnMut();
+        let fn_ptr = intr as &dyn Fn() as *const dyn Fn() as *const dyn Fn();
         // SAFETY: Upon destruction of Scope, this will be cleaned out.
-        let fn_static: &'static dyn FnMut() = unsafe { &*fn_ptr };
+        let fn_static: &'static dyn Fn() = unsafe { &*fn_ptr };
         callsite.set(fn_static);
+
+        let scope_objid = trigger.get_scopeobjid();
+        // store our address as a scope identifier of who owns this interrupt.
+        scope_objid.set(self.get_id());
         trigger.set_enable_bit(true);
+    }
+
+    fn get_id(&self) -> usize {
+        self as *const Scope<'scope> as usize
     }
 }
 
+/// > But isn't Drop never guaranteed to be called,
+/// > so why are you using it to uphold invariancies?
+/// >> Well yes in general that is true, however if you
+/// >> never mutable access to the Scope object,
+/// >> they can't cause shenanigans with it
+/// >> (unless of-course they knowingly cause UB and convert
+/// >>  a & to a &mut).
 impl<'scope> Drop for Scope<'scope> {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        // loop through all the scope_objids,
+        // check which ones are yours and disable their
+        // corresponding intr and callback.
+        let all_triggers = TriggerType::list_of_all_triggers();
+
+        for mut trigger in all_triggers {
+            let scopeid = trigger.get_scopeobjid();
+            if scopeid.get() == self.get_id() {
+                trigger.set_enable_bit(false);
+                let callsite = trigger.get_callsite();
+                callsite.set(&|| {});
+            }
+        }
+    }
 }
+
 pub enum TriggerType {
     Whatever,
 }
@@ -171,25 +212,17 @@ impl TriggerType {
         todo!("match on the specific kinda interrupt and set its interrupt bit true")
     }
 
-    fn get_callsite(&self) -> &SyncCell<&'static dyn FnMut()> {
+    fn get_callsite(&self) -> &SyncCell<&'static dyn Fn()> {
         &interrupt_vectors::interrupt_fn_1
         // todo!("match on the specific kinda interrupt and return its specific interrupt_fn_$num")
     }
-}
 
-mod tests {
-    use super::TriggerType;
+    fn get_scopeobjid(&self) -> &SyncCell<usize> {
+        &interrupt_vectors::scope_objids[0]
+    }
 
-    #[test]
-    fn test1() {
-        let mut a = 0;
-        let fn_modify_a = || a += 1;
-        super::scope(|scope_obj| {
-            scope_obj.attach(TriggerType::Whatever, &fn_modify_a);
-            let mut x = 5;
-            let fn_modify_x = || x += 1;
-            scope_obj.attach(TriggerType::Whatever, &fn_modify_x);
-        })
+    fn list_of_all_triggers() -> [Self; 1] {
+        [Self::Whatever]
     }
 }
 
@@ -200,13 +233,14 @@ mod interrupt_vectors {
     macro_rules! interrupt_vector {
         ($num:literal $(, $rest:tt)*) => {
             paste::paste! {
-                pub static [<interrupt_fn_$num>]: SyncCell<&dyn FnMut()> = SyncCell::new(&|| {
+                pub static [<interrupt_fn_$num>]: SyncCell<&dyn Fn()> = SyncCell::new(&|| {
                     nop();
                 });
 
                 #[no_mangle]
                 extern "avr-interrupt" fn [<__vector_ $num>]() {
-                    // nops_n($num);
+                    let callback: &dyn Fn() = [<interrupt_fn_$num>].get();
+                    callback();
                 }
             }
 
@@ -215,7 +249,7 @@ mod interrupt_vectors {
 
         ($name:ident $(, $rest:tt)*) => {
             paste::paste! {
-                pub static [<interrupt_fn_$name>]: SyncCell<&dyn FnMut()> = SyncCell::new(&|| {
+                pub static [<interrupt_fn_$name>]: SyncCell<&dyn Fn()> = SyncCell::new(&|| {
                     nop();
                 });
 
@@ -234,4 +268,6 @@ mod interrupt_vectors {
         default, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
         24, 25, 26
     );
+
+    pub static scope_objids: [SyncCell<usize>; 27] = [const { SyncCell::new(0) }; 27];
 }
