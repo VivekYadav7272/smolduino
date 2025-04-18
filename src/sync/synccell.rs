@@ -9,16 +9,6 @@ pub struct SyncCell<T: ?Sized>(UnsafeCell<T>);
 // SAFETY: Since Atmega328P is a single-"core" microcontroller,
 // and we've guarded against interrupts, hence it's effectively "shareable".
 unsafe impl<T: ?Sized> Sync for SyncCell<T> {}
-impl<T: Copy> SyncCell<T> {
-    pub fn get(&self) -> T {
-        interrupt::scoped_critical_section(|| {
-            // SAFETY: We're not going to be interrupted, so it's safe to read the value.
-            // + T: Copy means that we don't need to move the value out of the cell.
-            let val = unsafe { ptr::read(self.0.get()) };
-            val
-        })
-    }
-}
 
 impl<T: Copy> Clone for SyncCell<T> {
     fn clone(&self) -> Self {
@@ -26,7 +16,7 @@ impl<T: Copy> Clone for SyncCell<T> {
     }
 }
 
-impl<T: Default> Default for SyncCell<T> {
+impl<T: Default + Copy> Default for SyncCell<T> {
     /// Creates a `Cell<T>`, with the `Default` value for T.
     #[inline]
     fn default() -> SyncCell<T> {
@@ -52,13 +42,13 @@ impl<T: Ord + Copy> Ord for SyncCell<T> {
         self.get().cmp(&other.get())
     }
 }
-impl<T> From<T> for SyncCell<T> {
+impl<T: Copy> From<T> for SyncCell<T> {
     fn from(t: T) -> SyncCell<T> {
         SyncCell::new(t)
     }
 }
 
-impl<T> SyncCell<T> {
+impl<T: Copy> SyncCell<T> {
     pub const fn new(value: T) -> Self {
         Self(UnsafeCell::new(value))
     }
@@ -78,5 +68,31 @@ impl<T> SyncCell<T> {
 
     pub fn set(&self, value: T) {
         self.swap(value);
+    }
+
+    pub fn get(&self) -> T {
+        interrupt::scoped_critical_section(|| {
+            // SAFETY: We're not going to be interrupted, so it's safe to read the value.
+            // + T: Copy means that we don't need to move the value out of the cell.
+            let val = unsafe { ptr::read(self.0.get()) };
+            val
+        })
+    }
+
+    pub fn update<F>(&self, f: F) -> T
+    where
+        F: FnOnce(T) -> T,
+    {
+        interrupt::scoped_critical_section(|| {
+            // SAFETY: Same as self.get()
+            let old_val = unsafe { ptr::read(self.0.get()) };
+
+            let new_val = f(old_val);
+
+            // SAFETY: Same as self.get()
+            unsafe { ptr::write(self.0.get(), new_val) };
+
+            old_val
+        })
     }
 }
