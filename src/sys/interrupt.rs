@@ -9,7 +9,7 @@ use crate::sync::synccell::SyncCell;
 use super::{mappings::masks, reg_io::Mask};
 /*
 TODO:
-- Implement Interrupts
+- Implement Interrupts .. DONE
 - Implement Cell/RefCell analogues for AVR (basically clearing interrupts for "atomic" operations).. DONE
 - Write a setTimeout/setInterval function that utilises this API.
 */

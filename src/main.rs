@@ -14,7 +14,7 @@ use core::{panic::PanicInfo, time::Duration};
 use core2::io::Write;
 use io::serial::Serial;
 use smolduino::sync::synccell::SyncCell;
-use sys::interrupt;
+use sys::interrupt::{self, Scope};
 use timing::delay;
 
 #[panic_handler]
@@ -32,8 +32,8 @@ extern "C" fn main() -> ! {
     // without avoiding to call ::init() first, within which we can run our runtime init stuff.
     // However, I don'  t know how scalable this technique is, or do we have to add all these at runtime.
 
-    let mut a = 0;
-    let fn_inc_a = || a += 1;
+    let a = SyncCell::new(0);
+    let fn_inc_a = || a.set(a.get() + 1);
     interrupt::scope(|scope| {
         scope.attach(interrupt::TriggerType::Whatever, &fn_inc_a);
         // Uncommenting the following lines should fail to compile:
