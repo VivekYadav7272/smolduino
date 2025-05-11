@@ -204,25 +204,82 @@ impl<'scope> Drop for Scope<'scope> {
     }
 }
 
+#[derive(Clone, Copy)]
 pub enum TriggerType {
-    Whatever,
+    Reset = 1,
+    Int0 = 2,
+    Int1 = 3,
+    PcInt0 = 4,
+    PcInt1 = 5,
+    PcInt2 = 6,
+    WDT = 7,
+    Timer2CompA = 8,
+    Timer2CompB = 9,
+    Timer2Ovf = 10,
+    Timer1Capt = 11,
+    Timer1CompA = 12,
+    Timer1CompB = 13,
+    Timer1Ovf = 14,
+    Timer0CompA = 15,
+    Timer0CompB = 16,
+    Timer0Ovf = 17,
+    SpiStc = 18,
+    UsartRx = 19,
+    UsasrtUdre = 20,
+    UsartTx = 21,
+    Adc = 22,
+    EeReady = 23,
+    AnalogComp = 24,
+    TWI = 25,
+    SpmReady = 26,
 }
+
 impl TriggerType {
+    fn into_idx(&self) -> usize {
+        *self as usize - 1
+    }
     fn set_enable_bit(&mut self, do_enable: bool) {
         todo!("match on the specific kinda interrupt and set its interrupt bit true")
     }
 
     fn get_callsite(&self) -> &SyncCell<&'static dyn Fn()> {
-        &interrupt_vectors::interrupt_fn_1
+        &interrupt_vectors::interrupt_fns[self.into_idx()]
         // todo!("match on the specific kinda interrupt and return its specific interrupt_fn_$num")
     }
 
     fn get_scopeobjid(&self) -> &SyncCell<usize> {
-        &interrupt_vectors::scope_objids[0]
+        &interrupt_vectors::scope_objids[self.into_idx()]
     }
 
-    fn list_of_all_triggers() -> [Self; 1] {
-        [Self::Whatever]
+    fn list_of_all_triggers() -> [Self; interrupt_vectors::NUM_INTS] {
+        [
+            Self::Reset,
+            Self::Int0,
+            Self::Int1,
+            Self::PcInt0,
+            Self::PcInt1,
+            Self::PcInt2,
+            Self::WDT,
+            Self::Timer2CompA,
+            Self::Timer2CompB,
+            Self::Timer2Ovf,
+            Self::Timer1Capt,
+            Self::Timer1CompA,
+            Self::Timer1CompB,
+            Self::Timer1Ovf,
+            Self::Timer0CompA,
+            Self::Timer0CompB,
+            Self::Timer0Ovf,
+            Self::SpiStc,
+            Self::UsartRx,
+            Self::UsasrtUdre,
+            Self::UsartTx,
+            Self::Adc,
+            Self::EeReady,
+            Self::AnalogComp,
+            Self::TWI,
+            Self::SpmReady,
+        ]
     }
 }
 
@@ -230,16 +287,14 @@ mod interrupt_vectors {
     use crate::sync::synccell::SyncCell;
     use crate::utils::nop::nop;
 
+    pub const NUM_INTS: usize = 26;
+
     macro_rules! interrupt_vector {
         ($num:literal $(, $rest:tt)*) => {
             paste::paste! {
-                pub static [<interrupt_fn_$num>]: SyncCell<&dyn Fn()> = SyncCell::new(&|| {
-                    nop();
-                });
-
                 #[no_mangle]
                 extern "avr-interrupt" fn [<__vector_ $num>]() {
-                    let callback: &dyn Fn() = [<interrupt_fn_$num>].get();
+                    let callback: &dyn Fn() = interrupt_fns[[<$num>] - 1].get();
                     callback();
                 }
             }
@@ -247,27 +302,16 @@ mod interrupt_vectors {
             interrupt_vector!($($rest),*);
         };
 
-        ($name:ident $(, $rest:tt)*) => {
-            paste::paste! {
-                pub static [<interrupt_fn_$name>]: SyncCell<&dyn Fn()> = SyncCell::new(&|| {
-                    nop();
-                });
-
-                #[no_mangle]
-                extern "avr-interrupt" fn [<__vector_ $name>]() {
-                    // nops_n(69);
-                }
-            }
-            interrupt_vector!($($rest),*);
-        };
-
         () => {};
     }
 
     interrupt_vector!(
-        default, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-        24, 25, 26
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+        26
     );
 
-    pub static scope_objids: [SyncCell<usize>; 27] = [const { SyncCell::new(0) }; 27];
+    pub static interrupt_fns: [SyncCell<&dyn Fn()>; NUM_INTS] =
+        [const { SyncCell::new(&|| nop()) }; NUM_INTS];
+
+    pub static scope_objids: [SyncCell<usize>; NUM_INTS] = [const { SyncCell::new(0) }; NUM_INTS];
 }
