@@ -35,7 +35,7 @@ extern "C" fn main() -> ! {
     let a = SyncCell::new(0);
     let fn_inc_a = || a.set(a.get() + 1);
     interrupt::scope(|scope| {
-        scope.attach(interrupt::TriggerType::Whatever, &fn_inc_a);
+        scope.attach(interrupt::TriggerType::Int0, &fn_inc_a);
         // Uncommenting the following lines should fail to compile:
         // let mut b = 0;
         // let fn_inc_b = || b += 1;
