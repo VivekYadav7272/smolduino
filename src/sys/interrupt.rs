@@ -1,8 +1,4 @@
-use core::{
-    any::{Any, TypeId},
-    arch::asm,
-    marker::PhantomData,
-};
+use core::{arch::asm, marker::PhantomData};
 
 use crate::sync::synccell::SyncCell;
 
@@ -82,11 +78,21 @@ pub fn is_intr_enabled() -> bool {
     Mask::with_mask_val(masks::I, 0).read_reg_masked() != 0
 }
 
+/// EXTREMELY UNSAFE FUNCTION!!!!
+/// ONLY USE WHEN YOU'RE SURE THAT THE REFERENCE YOU
+/// GET FROM HERE WOULD ONLY BE USED AT MAX TILL
+/// 'a (can be destroyed later) OR IS ACTUALLY 'static
+/// AND THINGS GOT LOST IN TRANSLATION.
+unsafe fn coerce_static<'a, T: ?Sized>(t: &'a dyn Fn()) -> &'static (dyn Fn() + 'static) {
+    // SAFETY: User must ensure that this is valid to do.
+    core::mem::transmute(t)
+}
+
 // Nice, atmega328 already clears the 'I' bit when serving an interrupt,
 // so we don't need to worry about nested interrupts.
 pub struct Interrupt<T: Fn() + Sync + 'static> {
     trigger: TriggerType,
-    callback: &'static T,
+    callback: T,
 }
 
 // Unfortunately, since drop() is never guaranteed to be called,
@@ -94,7 +100,7 @@ pub struct Interrupt<T: Fn() + Sync + 'static> {
 // (like promise to remove reference to a non-'static closure)
 // Hence, we're forced to stick with 'static closures only.
 impl<T: Fn() + Sync + 'static> Interrupt<T> {
-    pub fn new(trigger: TriggerType, callback: &'static T) -> Self {
+    pub fn new(trigger: TriggerType, callback: T) -> Self {
         Self { trigger, callback }
     }
 
@@ -108,7 +114,12 @@ impl<T: Fn() + Sync + 'static> Interrupt<T> {
         // first, set the callback.
         let callsite = self.trigger.get_callsite();
 
-        callsite.set(self.callback);
+        // SAFETY: This is fine, because even if we got `mem::forgot`'d and self.callback was never dropped,
+        // and the interrupt continues to use that callback as handler,
+        // since it's a callback which is 'static, there is nothing contained inside it that references anything
+        // that might've died in the meanwhile.
+        let callback = unsafe { coerce_static::<&dyn Fn()>(&self.callback) };
+        callsite.set(callback);
         // depending on different TriggerTypes, enable that specific Trigger's interrupt.
         self.trigger.set_enable_bit(true);
     }
@@ -163,9 +174,10 @@ impl<'scope> Scope<'scope> {
     {
         let callsite = trigger.get_callsite();
         // the second pointer cast seems redundant, but it does an implicit cast from &'a to &'static.
-        let fn_ptr = intr as &dyn Fn() as *const dyn Fn() as *const dyn Fn();
+        // let fn_ptr = intr as &dyn Fn() as *const dyn Fn() as *const dyn Fn();
         // SAFETY: Upon destruction of Scope, this will be cleaned out.
-        let fn_static: &'static dyn Fn() = unsafe { &*fn_ptr };
+        let fn_static: &'static (dyn Fn() + 'static) =
+            unsafe { coerce_static::<&dyn Fn()>(intr as &dyn Fn()) };
         callsite.set(fn_static);
 
         let scope_objid = trigger.get_scopeobjid();
@@ -182,7 +194,7 @@ impl<'scope> Scope<'scope> {
 /// > But isn't Drop never guaranteed to be called,
 /// > so why are you using it to uphold invariancies?
 /// >> Well yes in general that is true, however if you
-/// >> never mutable access to the Scope object,
+/// >> never give mutable access to the Scope object,
 /// >> they can't cause shenanigans with it
 /// >> (unless of-course they knowingly cause UB and convert
 /// >>  a & to a &mut).
@@ -195,6 +207,7 @@ impl<'scope> Drop for Scope<'scope> {
 
         for mut trigger in all_triggers {
             let scopeid = trigger.get_scopeobjid();
+            // This is fine because only we have control over the location of Scope (we own it, not the user).
             if scopeid.get() == self.get_id() {
                 trigger.set_enable_bit(false);
                 let callsite = trigger.get_callsite();
@@ -225,7 +238,7 @@ pub enum TriggerType {
     Timer0Ovf = 17,
     SpiStc = 18,
     UsartRx = 19,
-    UsasrtUdre = 20,
+    UsartUdre = 20,
     UsartTx = 21,
     Adc = 22,
     EeReady = 23,
@@ -272,7 +285,7 @@ impl TriggerType {
             Self::Timer0Ovf,
             Self::SpiStc,
             Self::UsartRx,
-            Self::UsasrtUdre,
+            Self::UsartUdre,
             Self::UsartTx,
             Self::Adc,
             Self::EeReady,
