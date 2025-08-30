@@ -3,6 +3,7 @@ use crate::{
     sync::synccell::SyncCell,
     sys::{
         self,
+        interrupt::{Interrupt, TriggerType},
         mappings::{masks, regs},
         reg_io::{Mask, Register},
     },
@@ -21,6 +22,8 @@ static SINGLETON_TAKEN: SyncCell<bool> = SyncCell::new(false);
  */
 pub struct Serial {
     baud_rate: u32,
+    udre_int: Interrupt<fn()>,
+    rx_int: Interrupt<fn()>,
 }
 
 impl Serial {
@@ -29,14 +32,19 @@ impl Serial {
     pub fn with_baud_rate(baud_rate: u32) -> Result<Self, Error> {
         if !SINGLETON_TAKEN.get() {
             SINGLETON_TAKEN.set(true);
-            Self::init(baud_rate);
-            Ok(Self { baud_rate })
+            Self::configure_csrs(baud_rate);
+            let (rx_int, udre_int) = Self::set_interrupt_callbacks();
+            Ok(Self {
+                baud_rate,
+                rx_int,
+                udre_int,
+            })
         } else {
             Err(Error::SingletonAlreadyTaken)
         }
     }
 
-    fn init(baud_rate: u32) {
+    fn configure_csrs(baud_rate: u32) {
         Self::configure_ubrr(baud_rate);
         Self::configure_ucsr();
     }
@@ -83,6 +91,7 @@ impl Serial {
     fn configure_ucsr() {
         // For UCSRA register
         // --- NOTHING TO DO FOR NOW, will be used when sending/receiving packets --
+
         // U2X0 already handled in configure_ubrr() according to baud rate rquired
 
         // For UCSRB register
@@ -116,14 +125,33 @@ impl Serial {
                 .write_val();
         }
     }
+
+    fn set_interrupt_callbacks() -> (Interrupt<fn()>, Interrupt<fn()>) {
+        (
+            Interrupt::new(TriggerType::UsartRx, Self::receive_data),
+            Interrupt::new(TriggerType::UsartUdre, Self::transmit_data),
+        )
+    }
+
+    fn receive_data() {
+        if Mask::with_mask(masks::RXC0).read_mask() != 1 {
+            return;
+        }
+
+        // TODO(important): Before reading in UDR0, check for errors by reading in UCSR0A
+        let content = Register::<regs::UDR0>::new().read_reg();
+        // create a mutex receive buff of apt length
+        // similarly for send, and finally we'll have an awesome impl
+    }
+
+    fn transmit_data() {}
 }
 
 impl Serial {
     pub fn write(&mut self, byte: u8) -> io::Result<usize> {
         // TODO: Make it robust, this is just to see if everything till now has been configured
         // correctly or not.
-        // only using the mask for reading from reg so value here doesn't matter.
-        let udre = Mask::with_mask_val(masks::UDRE0, 0);
+        let udre = Mask::with_mask(masks::UDRE0);
         while udre.read_reg_masked() == 0 {}
 
         let mut udr = Register::<regs::UDR0>::new();
@@ -151,6 +179,15 @@ impl io::Write for Serial {
     fn flush(&mut self) -> io::Result<()> {
         // TODO: When we implement buffers for RX/TX, then we need to flush them here.
         Ok(())
+    }
+}
+
+impl io::Read for Serial {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        Err(io::Error::new(
+            io::ErrorKind::NotConnected,
+            "serial stdin not connected yet",
+        ))
     }
 }
 

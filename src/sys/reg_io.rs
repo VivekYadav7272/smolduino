@@ -131,6 +131,12 @@ impl<Reg: RegisterMapping> Mask<Reg> {
         me
     }
 
+    pub fn with_mask<M: MaskMapping<Register = Reg>>(mask: M) -> Self {
+        let mut me = Self::new();
+        me.add_mask(mask);
+        me
+    }
+
     pub fn add_mask_val<M: MaskMapping<Register = Reg>>(&mut self, _mask: M, val: u8) -> &mut Self {
         self.val |= (val << M::get_shift()) & M::get_mask();
         self.mask |= M::get_mask();
