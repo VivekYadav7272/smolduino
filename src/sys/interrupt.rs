@@ -148,8 +148,6 @@ where
     scoped(&scope);
 }
 
-// Things to think about: How to store interrupt handlers
-// when all closures have different sizes/types?
 pub struct Scope<'scope> {
     scope_lifetime: PhantomData<&'scope mut &'scope ()>,
 }
