@@ -5,6 +5,7 @@ pub enum Error {
     SingletonAlreadyTaken,
     SerialWriteFailed(io::Error),
     LockAlreadyAcquiredError,
+    VecFull(usize),
 }
 
 impl core::error::Error for Error {}
@@ -19,6 +20,9 @@ impl core::fmt::Display for Error {
             ),
             Self::SerialWriteFailed(e) => writeln!(f, "Serial::write(_) has failed. Error: {e}"),
             Self::LockAlreadyAcquiredError => writeln!(f, "Lock already taken by another entity."),
+            Self::VecFull(vec_size) => {
+                writeln!(f, "Vec is completely full (capacity {vec_size} reached)")
+            }
         }
     }
 }
